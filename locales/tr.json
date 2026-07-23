@@ -1,0 +1,119 @@
+{
+  "nav": {
+    "logo": "Less Token",
+    "download": "İndir"
+  },
+  "hero": {
+    "title": "AI Token Kullanımınızı Optimize Edin",
+    "description": "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.",
+    "downloadBtn": "Şimdi İndir",
+    "learnBtn": "Daha Fazla Bilgi"
+  },
+  "stats": {
+    "savings": "Token Tasarrufu",
+    "reduction": "Boyut Azaltma",
+    "providers": "AI Sağlayıcı",
+    "pricing": "Açık Kaynak"
+  },
+  "features": {
+    "title": "Güçlü Özellikler",
+    "imageOpt": {
+      "title": "Görüntü Optimizasyonu",
+      "desc": "Görselleri yeniden boyutlandır, sıkıştır ve metin çıkar. 4000×2500px → 5KB OCR ile."
+    },
+    "docProcess": {
+      "title": "Belge İşleme",
+      "desc": "PDF, Word, CSV dosyalarından metin çıkar. Akıllı token tahmini."
+    },
+    "multiProvider": {
+      "title": "Çok Sağlayıcı",
+      "desc": "OpenAI, Claude, Gemini, Ollama. En ucuz veya en hızlı sağlayıcıyı otomatik seç."
+    },
+    "realtime": {
+      "title": "Gerçek Zamanlı İşlem",
+      "desc": "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle."
+    },
+    "costTracking": {
+      "title": "Maliyet Takibi",
+      "desc": "Kullanılan tokenları, sor başına maliyeti, toplam harcamayı takip et. Tam tarih araması."
+    },
+    "easySetup": {
+      "title": "Kolay Kurulum",
+      "desc": "Tek tıkla yükleyici. Ayar gerekmez. Windows'ta çalışır."
+    }
+  },
+  "results": {
+    "title": "Gerçek Sonuçlar",
+    "screenshot": {
+      "title": "4K Ekran Görüntüsü Optimizasyonu",
+      "before": "Öncesi",
+      "after": "Sonrası",
+      "savings": "%99 Tasarruf"
+    },
+    "pdf": {
+      "title": "50 Sayfalık PDF Çıkarma",
+      "before": "Öncesi",
+      "after": "Sonrası",
+      "savings": "%95 Tasarruf"
+    },
+    "comparison": {
+      "title": "Çok Sağlayıcı Karşılaştırması",
+      "before": "Öncesi",
+      "after": "Sonrası",
+      "savings": "%96 Tasarruf",
+      "detail": "Aynı sonuç, 24¢ tasarruf"
+    }
+  },
+  "pricing": {
+    "title": "Basit Fiyatlandırma",
+    "free": "Ücretsiz",
+    "desc": "Açık kaynak masaüstü uygulaması",
+    "features": [
+      "✓ Görüntü ve PDF optimizasyonu",
+      "✓ Çok sağlayıcı desteği",
+      "✓ Gerçek zamanlı pano izleme",
+      "✓ Tam tarih ve analitik",
+      "✓ Windows masaüstü uygulaması"
+    ],
+    "btn": "Windows için İndir"
+  },
+  "download": {
+    "title": "30 Saniyede Başla",
+    "step1": "Yükleyiciyi İndir",
+    "step1Desc": "lesstoken-setup.exe (45 MB)",
+    "step2": "Çalıştır ve Kur",
+    "step2Desc": "İleri, ileri, bitir'i tıkla",
+    "step3": "Optimize Etmeye Başla",
+    "step3Desc": "Metin/görsel kopyala → Sonuç al",
+    "btn": "Windows için İndir (v1.0.0)"
+  },
+  "faq": {
+    "title": "Sık Sorulan Sorular",
+    "q1": "API anahtarı gerekli mi?",
+    "q2": "Verilerim gizli mi?",
+    "q3": "Hangi dosya türleri desteklenir?",
+    "q4": "Birden fazla AI sağlayıcı kullanabilir miyim?",
+    "q5": "CLI versiyonu var mı?"
+  },
+  "cta": {
+    "title": "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin",
+    "desc": "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.",
+    "btn": "Şimdi İndir"
+  },
+  "footer": {
+    "tagline": "AI token kullanımını optimize edin",
+    "product": "Ürün",
+    "resources": "Kaynaklar",
+    "legal": "Yasal",
+    "features": "Özellikler",
+    "pricingLink": "Fiyatlandırma",
+    "downloadLink": "İndir",
+    "docs": "Dokümantasyon",
+    "github": "GitHub",
+    "blog": "Blog",
+    "privacy": "Gizlilik",
+    "terms": "Şartlar",
+    "license": "Lisans",
+    "copyright": "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır."
+  }
+}

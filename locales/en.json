@@ -1,0 +1,119 @@
+{
+  "nav": {
+    "logo": "Less Token",
+    "download": "Download"
+  },
+  "hero": {
+    "title": "Optimize Your AI Token Usage",
+    "description": "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.",
+    "downloadBtn": "Download Now",
+    "learnBtn": "Learn More"
+  },
+  "stats": {
+    "savings": "Token Savings",
+    "reduction": "Size Reduction",
+    "providers": "AI Providers",
+    "pricing": "Open Source"
+  },
+  "features": {
+    "title": "Powerful Features",
+    "imageOpt": {
+      "title": "Image Optimization",
+      "desc": "Resize, compress, and extract text from images. 4000×2500px → 5KB with OCR."
+    },
+    "docProcess": {
+      "title": "Document Processing",
+      "desc": "Extract text from PDFs, Word docs, CSV files. Intelligent token estimation."
+    },
+    "multiProvider": {
+      "title": "Multi-Provider",
+      "desc": "OpenAI, Claude, Gemini, Ollama. Auto-select cheapest or fastest provider."
+    },
+    "realtime": {
+      "title": "Real-time Processing",
+      "desc": "Monitor clipboard, auto-detect content, process instantly with hotkeys."
+    },
+    "costTracking": {
+      "title": "Cost Tracking",
+      "desc": "Track tokens used, costs per prompt, total spending. Full history search."
+    },
+    "easySetup": {
+      "title": "Easy Setup",
+      "desc": "One-click installer. No configuration needed. Works on Windows."
+    }
+  },
+  "results": {
+    "title": "Real Results",
+    "screenshot": {
+      "title": "4K Screenshot Optimization",
+      "before": "Before",
+      "after": "After",
+      "savings": "99% Savings"
+    },
+    "pdf": {
+      "title": "50-Page PDF Extraction",
+      "before": "Before",
+      "after": "After",
+      "savings": "95% Savings"
+    },
+    "comparison": {
+      "title": "Multi-Provider Comparison",
+      "before": "Before",
+      "after": "After",
+      "savings": "96% Savings",
+      "detail": "Same result, 24¢ saved"
+    }
+  },
+  "pricing": {
+    "title": "Simple Pricing",
+    "free": "Free",
+    "desc": "Open source desktop application",
+    "features": [
+      "✓ Image & PDF optimization",
+      "✓ Multi-provider support",
+      "✓ Real-time clipboard monitoring",
+      "✓ Full history & analytics",
+      "✓ Windows desktop app"
+    ],
+    "btn": "Download for Windows"
+  },
+  "download": {
+    "title": "Get Started in 30 Seconds",
+    "step1": "Download Installer",
+    "step1Desc": "lesstoken-setup.exe (45 MB)",
+    "step2": "Run & Install",
+    "step2Desc": "Click next, next, finish",
+    "step3": "Start Optimizing",
+    "step3Desc": "Copy text/images → Get results",
+    "btn": "Download for Windows (v1.0.0)"
+  },
+  "faq": {
+    "title": "FAQ",
+    "q1": "Do I need API keys?",
+    "q2": "Is my data private?",
+    "q3": "What file types are supported?",
+    "q4": "Can I use multiple AI providers?",
+    "q5": "Is there a CLI version?"
+  },
+  "cta": {
+    "title": "Save up to 96% on AI Costs",
+    "desc": "Start optimizing your tokens today. It only takes 30 seconds.",
+    "btn": "Download Now"
+  },
+  "footer": {
+    "tagline": "Optimize AI token usage",
+    "product": "Product",
+    "resources": "Resources",
+    "legal": "Legal",
+    "features": "Features",
+    "pricingLink": "Pricing",
+    "downloadLink": "Download",
+    "docs": "Documentation",
+    "github": "GitHub",
+    "blog": "Blog",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "license": "License",
+    "copyright": "© 2026 Less Token. All rights reserved. Made with care for budget-conscious developers."
+  }
+}

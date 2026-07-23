@@ -1,0 +1,414 @@
+import React, { useEffect, useState } from 'react';
+import { Download, Zap, Cloud, BarChart3, Image as ImageIcon, FileText } from 'lucide-react';
+
+const localesData = {
+  tr: {
+    nav: { logo: "Less Token", download: "İndir" },
+    hero: { title: "AI Token Kullanımınızı Optimize Edin", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
+    stats: { savings: "Token Tasarrufu", reduction: "Boyut Azaltma", providers: "AI Sağlayıcı", pricing: "Açık Kaynak" },
+    features: {
+      title: "Güçlü Özellikler",
+      imageOpt: { title: "Görüntü Optimizasyonu", desc: "Görselleri yeniden boyutlandır, sıkıştır ve metin çıkar. 4000×2500px → 5KB OCR ile." },
+      docProcess: { title: "Belge İşleme", desc: "PDF, Word, CSV dosyalarından metin çıkar. Akıllı token tahmini." },
+      multiProvider: { title: "Çok Sağlayıcı", desc: "OpenAI, Claude, Gemini, Ollama. En ucuz veya en hızlı sağlayıcıyı otomatik seç." },
+      realtime: { title: "Gerçek Zamanlı İşlem", desc: "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle." },
+      costTracking: { title: "Maliyet Takibi", desc: "Kullanılan tokenları, sor başına maliyeti, toplam harcamayı takip et. Tam tarih araması." },
+      easySetup: { title: "Kolay Kurulum", desc: "Tek tıkla yükleyici. Ayar gerekmez. Windows'ta çalışır." }
+    },
+    results: {
+      title: "Gerçek Sonuçlar",
+      screenshot: { title: "4K Ekran Görüntüsü Optimizasyonu", before: "Öncesi", after: "Sonrası", savings: "%99 Tasarruf" },
+      pdf: { title: "50 Sayfalık PDF Çıkarma", before: "Öncesi", after: "Sonrası", savings: "%95 Tasarruf" },
+      comparison: { title: "Çok Sağlayıcı Karşılaştırması", before: "Öncesi", after: "Sonrası", savings: "%96 Tasarruf", detail: "Aynı sonuç, 24¢ tasarruf" }
+    },
+    pricing: { title: "Basit Fiyatlandırma", free: "Ücretsiz", desc: "Açık kaynak masaüstü uygulaması", features: ["✓ Görüntü ve PDF optimizasyonu", "✓ Çok sağlayıcı desteği", "✓ Gerçek zamanlı pano izleme", "✓ Tam tarih ve analitik", "✓ Windows masaüstü uygulaması"], btn: "Windows için İndir" },
+    download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (45 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
+    faq: { title: "Sık Sorulan Sorular", q1: "API anahtarı gerekli mi?", q2: "Verilerim gizli mi?", q3: "Hangi dosya türleri desteklenir?", q4: "Birden fazla AI sağlayıcı kullanabilir miyim?", q5: "CLI versiyonu var mı?" },
+    cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
+    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
+  },
+  en: {
+    nav: { logo: "Less Token", download: "Download" },
+    hero: { title: "Optimize Your AI Token Usage", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
+    stats: { savings: "Token Savings", reduction: "Size Reduction", providers: "AI Providers", pricing: "Open Source" },
+    features: {
+      title: "Powerful Features",
+      imageOpt: { title: "Image Optimization", desc: "Resize, compress, and extract text from images. 4000×2500px → 5KB with OCR." },
+      docProcess: { title: "Document Processing", desc: "Extract text from PDFs, Word docs, CSV files. Intelligent token estimation." },
+      multiProvider: { title: "Multi-Provider", desc: "OpenAI, Claude, Gemini, Ollama. Auto-select cheapest or fastest provider." },
+      realtime: { title: "Real-time Processing", desc: "Monitor clipboard, auto-detect content, process instantly with hotkeys." },
+      costTracking: { title: "Cost Tracking", desc: "Track tokens used, costs per prompt, total spending. Full history search." },
+      easySetup: { title: "Easy Setup", desc: "One-click installer. No configuration needed. Works on Windows." }
+    },
+    results: {
+      title: "Real Results",
+      screenshot: { title: "4K Screenshot Optimization", before: "Before", after: "After", savings: "99% Savings" },
+      pdf: { title: "50-Page PDF Extraction", before: "Before", after: "After", savings: "95% Savings" },
+      comparison: { title: "Multi-Provider Comparison", before: "Before", after: "After", savings: "96% Savings", detail: "Same result, 24¢ saved" }
+    },
+    pricing: { title: "Simple Pricing", free: "Free", desc: "Open source desktop application", features: ["✓ Image & PDF optimization", "✓ Multi-provider support", "✓ Real-time clipboard monitoring", "✓ Full history & analytics", "✓ Windows desktop app"], btn: "Download for Windows" },
+    download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (45 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
+    faq: { title: "FAQ", q1: "Do I need API keys?", q2: "Is my data private?", q3: "What file types are supported?", q4: "Can I use multiple AI providers?", q5: "Is there a CLI version?" },
+    cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
+    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 Less Token. All rights reserved. Made with care for budget-conscious developers." }
+  }
+};
+
+function HomeContent() {
+  const [lang, setLang] = useState('tr');
+  const [i18n, setI18n] = useState(localesData.tr);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const savedLang = localStorage.getItem('lang');
+    let detectedLang = 'tr';
+
+    if (savedLang) {
+      detectedLang = savedLang;
+    } else {
+      const browserLang = navigator.language.split('-')[0];
+      detectedLang = ['tr', 'en'].includes(browserLang) ? browserLang : 'tr';
+      localStorage.setItem('lang', detectedLang);
+    }
+
+    setLang(detectedLang);
+    setI18n(localesData[detectedLang]);
+  }, []);
+
+  const changeLang = (newLang) => {
+    setLang(newLang);
+    localStorage.setItem('lang', newLang);
+    setI18n(localesData[newLang]);
+  };
+
+  return (
+    <div className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-slate-900/80 backdrop-blur border-b border-slate-700/50 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            {i18n?.nav?.logo}
+          </div>
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-1 bg-slate-800/50 rounded-lg p-1 border border-slate-700">
+              <button
+                onClick={() => changeLang('en')}
+                className={`px-3 py-1 rounded text-sm font-medium transition ${
+                  lang === 'en'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => changeLang('tr')}
+                className={`px-3 py-1 rounded text-sm font-medium transition ${
+                  lang === 'tr'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                TR
+              </button>
+            </div>
+            <a
+              href="#download"
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold transition"
+            >
+              {i18n?.nav?.download}
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            {i18n?.hero?.title}
+          </h1>
+          <p className="text-xl text-gray-300 mb-8">
+            {i18n?.hero?.description}
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold text-lg transition">
+              {i18n?.hero?.downloadBtn}
+            </button>
+            <button className="border border-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold text-lg transition">
+              {i18n?.hero?.learnBtn}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-16 px-6 border-y border-slate-700">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+          <div className="text-center">
+            <p className="text-4xl font-bold text-blue-400 mb-2">99%</p>
+            <p className="text-gray-400">{i18n?.stats?.savings}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-bold text-blue-400 mb-2">96%</p>
+            <p className="text-gray-400">{i18n?.stats?.reduction}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-bold text-blue-400 mb-2">6+</p>
+            <p className="text-gray-400">{i18n?.stats?.providers}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-bold text-blue-400 mb-2">Free</p>
+            <p className="text-gray-400">{i18n?.stats?.pricing}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">{i18n?.features?.title}</h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<ImageIcon className="w-12 h-12" />}
+              title={i18n?.features?.imageOpt?.title}
+              description={i18n?.features?.imageOpt?.desc}
+            />
+            <FeatureCard
+              icon={<FileText className="w-12 h-12" />}
+              title={i18n?.features?.docProcess?.title}
+              description={i18n?.features?.docProcess?.desc}
+            />
+            <FeatureCard
+              icon={<Cloud className="w-12 h-12" />}
+              title={i18n?.features?.multiProvider?.title}
+              description={i18n?.features?.multiProvider?.desc}
+            />
+            <FeatureCard
+              icon={<Zap className="w-12 h-12" />}
+              title={i18n?.features?.realtime?.title}
+              description={i18n?.features?.realtime?.desc}
+            />
+            <FeatureCard
+              icon={<BarChart3 className="w-12 h-12" />}
+              title={i18n?.features?.costTracking?.title}
+              description={i18n?.features?.costTracking?.desc}
+            />
+            <FeatureCard
+              icon={<Download className="w-12 h-12" />}
+              title={i18n?.features?.easySetup?.title}
+              description={i18n?.features?.easySetup?.desc}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Showcase */}
+      <section className="py-20 px-6 bg-slate-800/50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">{i18n?.results?.title}</h2>
+
+          <div className="space-y-8">
+            <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-8">
+              <h3 className="text-2xl font-bold mb-6">{i18n?.results?.screenshot?.title}</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.screenshot?.before}</p>
+                  <p className="text-lg font-semibold">2.5 MB</p>
+                  <p className="text-gray-300">50,000 tokens</p>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="text-3xl text-blue-400">→</div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.screenshot?.after}</p>
+                  <p className="text-lg font-semibold text-green-400">80 KB</p>
+                  <p className="text-gray-300">500 tokens</p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <p className="text-blue-400 font-semibold">{i18n?.results?.screenshot?.savings}</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-8">
+              <h3 className="text-2xl font-bold mb-6">{i18n?.results?.pdf?.title}</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.pdf?.before}</p>
+                  <p className="text-lg font-semibold">40 MB</p>
+                  <p className="text-gray-300">40,000 tokens</p>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="text-3xl text-blue-400">→</div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.pdf?.after}</p>
+                  <p className="text-lg font-semibold text-green-400">200 KB</p>
+                  <p className="text-gray-300">2,000 tokens</p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <p className="text-blue-400 font-semibold">{i18n?.results?.pdf?.savings}</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-8">
+              <h3 className="text-2xl font-bold mb-6">{i18n?.results?.comparison?.title}</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.comparison?.before}</p>
+                  <p className="text-lg font-semibold">$0.250</p>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="text-3xl text-blue-400">→</div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">{i18n?.results?.comparison?.after}</p>
+                  <p className="text-lg font-semibold text-green-400">$0.01</p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <p className="text-blue-400 font-semibold">{i18n?.results?.comparison?.savings}</p>
+                <p className="text-gray-400 text-sm">{i18n?.results?.comparison?.detail}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-8">{i18n?.pricing?.title}</h2>
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-12">
+            <p className="text-6xl font-bold mb-4">{i18n?.pricing?.free}</p>
+            <p className="text-xl text-blue-100 mb-8">{i18n?.pricing?.desc}</p>
+            <ul className="text-left text-lg space-y-3 text-blue-50 mb-8">
+              {i18n?.pricing?.features?.map((feature, i) => (
+                <li key={i}>{feature}</li>
+              ))}
+            </ul>
+            <button className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition text-lg">
+              {i18n?.pricing?.btn}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Download */}
+      <section id="download" className="py-20 px-6 border-t border-slate-700">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-8">{i18n?.download?.title}</h2>
+          <div className="bg-slate-800/50 rounded-xl p-8 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">1</div>
+              <div className="text-left">
+                <p className="font-semibold">{i18n?.download?.step1}</p>
+                <p className="text-gray-400">{i18n?.download?.step1Desc}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">2</div>
+              <div className="text-left">
+                <p className="font-semibold">{i18n?.download?.step2}</p>
+                <p className="text-gray-400">{i18n?.download?.step2Desc}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">3</div>
+              <div className="text-left">
+                <p className="font-semibold">{i18n?.download?.step3}</p>
+                <p className="text-gray-400">{i18n?.download?.step3Desc}</p>
+              </div>
+            </div>
+            <button className="w-full bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-bold text-lg transition mt-8">
+              {i18n?.download?.btn}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 px-6 bg-slate-800/50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">{i18n?.faq?.title}</h2>
+          <div className="space-y-6">
+            {[i18n?.faq?.q1, i18n?.faq?.q2, i18n?.faq?.q3, i18n?.faq?.q4, i18n?.faq?.q5].map((q, idx) => (
+              <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+                <button className="w-full flex justify-between items-center font-semibold text-lg hover:text-blue-400 transition">
+                  <span>{q}</span>
+                  <span>+</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 border-t border-slate-700">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">{i18n?.cta?.title}</h2>
+          <p className="text-xl text-gray-300 mb-8">{i18n?.cta?.desc}</p>
+          <button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 px-8 py-4 rounded-lg font-bold text-lg transition">
+            {i18n?.cta?.btn}
+          </button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-slate-700">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <p className="font-bold mb-4">Less Token</p>
+              <p className="text-gray-400 text-sm">{i18n?.footer?.tagline}</p>
+            </div>
+            <div>
+              <p className="font-semibold mb-4">{i18n?.footer?.product}</p>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.features}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.pricingLink}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.downloadLink}</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-4">{i18n?.footer?.resources}</p>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.docs}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.blog}</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-4">{i18n?.footer?.legal}</p>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.privacy}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.terms}</a></li>
+                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.license}</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-700 pt-8 text-center text-gray-400 text-sm">
+            <p>{i18n?.footer?.copyright}</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, description }) {
+  return (
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-blue-500/50 transition">
+      <div className="text-blue-400 mb-4">{icon}</div>
+      <h3 className="text-xl font-bold mb-3">{title}</h3>
+      <p className="text-gray-400">{description}</p>
+    </div>
+  );
+}
+
+export default HomeContent;
