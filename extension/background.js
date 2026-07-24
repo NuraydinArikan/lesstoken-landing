@@ -1,0 +1,277 @@
+// Background Service Worker
+console.log('[Less Token] Background service worker started');
+
+// Listen for optimize requests
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'optimize') {
+    optimizeText(request.text, request.provider)
+      .then(result => {
+        sendResponse({
+          success: true,
+          result: result.optimized,
+          stats: result.stats
+        });
+      })
+      .catch(error => {
+        sendResponse({
+          success: false,
+          error: error.message
+        });
+      });
+
+    // Indicate we'll respond asynchronously
+    return true;
+  }
+});
+
+// Optimization prompts for different use cases
+const OPTIMIZATION_PROMPTS = {
+  general: `You are an expert text optimizer focused on reducing token usage while preserving meaning and quality.
+
+Rules:
+1. Remove redundancy and repetition
+2. Use concise language and abbreviations where appropriate
+3. Eliminate filler words (very, actually, basically, etc.)
+4. Combine related sentences
+5. Use active voice
+6. Keep important information
+7. Maintain tone and context
+
+Output ONLY the optimized text, no explanations.`,
+
+  technical: `You are an expert at optimizing technical documentation and code comments.
+
+Rules:
+1. Keep technical accuracy
+2. Simplify explanations without losing precision
+3. Use standard abbreviations (e.g., impl, attr, config)
+4. Remove verbose descriptions
+5. Keep code examples concise
+6. Maintain structure and hierarchy
+
+Output ONLY the optimized text, no explanations.`,
+
+  marketing: `You are an expert at optimizing marketing and sales copy.
+
+Rules:
+1. Keep persuasive impact
+2. Maintain emotional connection
+3. Remove filler, keep power words
+4. Tighten headlines and CTAs
+5. Preserve brand voice
+6. Keep calls-to-action clear
+
+Output ONLY the optimized text, no explanations.`,
+
+  academic: `You are an expert at optimizing academic and research writing.
+
+Rules:
+1. Preserve technical accuracy
+2. Simplify complex sentences
+3. Remove repetition between sections
+4. Use standard abbreviations
+5. Keep citations clear
+6. Maintain formal tone
+
+Output ONLY the optimized text, no explanations.`
+};
+
+// Main optimization logic
+async function optimizeText(text, provider) {
+  // Get API key from storage
+  const settings = await chrome.storage.local.get([
+    `${provider}-key`,
+    'optimization-style',
+    'history'
+  ]);
+
+  const apiKey = settings[`${provider}-key`];
+  const style = settings['optimization-style'] || 'general';
+
+  if (!apiKey) {
+    throw new Error('API key not configured. Please go to settings.');
+  }
+
+  let optimized;
+  let inputTokens;
+  let outputTokens;
+
+  const prompt = OPTIMIZATION_PROMPTS[style] || OPTIMIZATION_PROMPTS.general;
+
+  switch (provider) {
+    case 'openai':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithOpenAI(text, prompt, apiKey));
+      break;
+    case 'claude':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithClaude(text, prompt, apiKey));
+      break;
+    case 'gemini':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithGemini(text, prompt, apiKey));
+      break;
+    case 'ollama':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithOllama(text, prompt));
+      break;
+    default:
+      throw new Error('Unknown provider');
+  }
+
+  // Calculate reduction
+  const inputLength = text.split(/\s+/).length;
+  const outputLength = optimized.split(/\s+/).length;
+  const reduction = Math.round(((inputLength - outputLength) / inputLength) * 100);
+
+  // Save to history
+  const history = settings.history || [];
+  history.push({
+    timestamp: Date.now(),
+    input: text,
+    output: optimized,
+    provider: provider,
+    style: style,
+    reduction: reduction,
+    inputTokens: inputTokens,
+    outputTokens: outputTokens
+  });
+
+  // Keep only last 50 items
+  if (history.length > 50) {
+    history.shift();
+  }
+
+  await chrome.storage.local.set({ history });
+
+  return {
+    optimized,
+    stats: {
+      inputTokens,
+      outputTokens,
+      reduction: Math.max(0, reduction)
+    }
+  };
+}
+
+// OpenAI API integration
+async function optimizeWithOpenAI(text, prompt, apiKey) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4-turbo-preview',
+      messages: [{
+        role: 'system',
+        content: prompt
+      }, {
+        role: 'user',
+        content: text
+      }],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.choices[0].message.content,
+    inputTokens: data.usage.prompt_tokens,
+    outputTokens: data.usage.completion_tokens
+  };
+}
+
+// Claude API integration
+async function optimizeWithClaude(text, prompt, apiKey) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4',
+      max_tokens: 2000,
+      system: prompt,
+      messages: [{
+        role: 'user',
+        content: text
+      }]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Claude API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.content[0].text,
+    inputTokens: data.usage.input_tokens,
+    outputTokens: data.usage.output_tokens
+  };
+}
+
+// Google Gemini API integration
+async function optimizeWithGemini(text, prompt, apiKey) {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${prompt}\n\n${text}`
+          }]
+        }]
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Gemini API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.candidates[0].content.parts[0].text,
+    inputTokens: text.split(/\s+/).length,
+    outputTokens: data.candidates[0].content.parts[0].text.split(/\s+/).length
+  };
+}
+
+// Ollama (local) integration
+async function optimizeWithOllama(text, prompt) {
+  const { 'ollama-url': ollamaUrl } = await chrome.storage.local.get('ollama-url');
+  const url = ollamaUrl || 'http://localhost:11434';
+
+  const response = await fetch(`${url}/api/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'mistral',
+      prompt: `${prompt}\n\n${text}`,
+      stream: false
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ollama error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.response,
+    inputTokens: text.split(/\s+/).length,
+    outputTokens: data.response.split(/\s+/).length
+  };
+}

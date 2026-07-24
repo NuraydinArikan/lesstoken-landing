@@ -1,0 +1,120 @@
+"""
+Database models and initialization for Less Token Web App
+"""
+
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import declarative_base
+
+# Initialize SQLAlchemy
+db = SQLAlchemy()
+
+# ============================================================================
+# Database Models
+# ============================================================================
+
+class User(db.Model):
+    """User account model"""
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    password = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    history = db.relationship('OptimizationHistory', backref='user', lazy=True, cascade='all, delete-orphan')
+    settings = db.relationship('UserSettings', backref='user', lazy=True, cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'created_at': self.created_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<User {self.email}>'
+
+
+class OptimizationHistory(db.Model):
+    """User optimization history"""
+    __tablename__ = 'optimization_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    input_text = db.Column(db.Text, nullable=False)
+    output_text = db.Column(db.Text, nullable=False)
+    provider = db.Column(db.String(50), nullable=False)  # openai, claude, gemini, ollama
+    style = db.Column(db.String(50), default='general')  # general, technical, marketing, academic
+    input_tokens = db.Column(db.Integer, default=0)
+    output_tokens = db.Column(db.Integer, default=0)
+    reduction_percent = db.Column(db.Float, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'input': self.input_text[:200],  # Preview
+            'output': self.output_text[:200],
+            'provider': self.provider,
+            'style': self.style,
+            'reduction': self.reduction_percent,
+            'inputTokens': self.input_tokens,
+            'outputTokens': self.output_tokens,
+            'timestamp': self.created_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<Optimization {self.id} by User {self.user_id}>'
+
+
+class UserSettings(db.Model):
+    """User preferences and settings"""
+    __tablename__ = 'user_settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
+    preferred_provider = db.Column(db.String(50), default='openai')
+    preferred_style = db.Column(db.String(50), default='general')
+    notifications_enabled = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'preferredProvider': self.preferred_provider,
+            'preferredStyle': self.preferred_style,
+            'notificationsEnabled': self.notifications_enabled
+        }
+
+    def __repr__(self):
+        return f'<UserSettings for User {self.user_id}>'
+
+
+# ============================================================================
+# Database Initialization
+# ============================================================================
+
+def init_db(app):
+    """Initialize database with Flask app"""
+    db.init_app(app)
+
+    with app.app_context():
+        # Create all tables
+        db.create_all()
+        print('✓ Database initialized')
+
+
+def get_db():
+    """Get database session"""
+    return db.session
+
+
+def reset_db(app):
+    """DANGEROUS: Reset entire database (development only)"""
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        print('⚠️  Database reset (all data deleted)')

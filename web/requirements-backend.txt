@@ -1,0 +1,26 @@
+# Flask Web App Backend Dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.0.5
+SQLAlchemy==2.0.20
+PyJWT==2.8.1
+requests==2.31.0
+packaging==23.1
+python-dotenv==1.0.0
+
+# Email
+Flask-Mail==0.9.1
+sendgrid==6.10.0
+
+# Production
+gunicorn==21.2.0
+python-dotenv==1.0.0
+
+# Optional: Database drivers
+psycopg2-binary==2.9.7  # PostgreSQL (for production)
+
+# Development
+pytest==7.4.0
+pytest-flask==1.2.0
+black==23.7.0
+flake8==6.0.0

@@ -364,7 +364,10 @@ function HomeContent() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <p className="font-bold mb-4">Less Token</p>
+              <div className="flex items-center gap-2 mb-4">
+                <img src="/logo.svg" alt="Less Token" style={{ width: '32px', height: '32px' }} />
+                <p className="font-bold">Less Token</p>
+              </div>
               <p className="text-gray-400 text-sm">{i18n?.footer?.tagline}</p>
             </div>
             <div>
@@ -378,17 +381,17 @@ function HomeContent() {
             <div>
               <p className="font-semibold mb-4">{i18n?.footer?.resources}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.docs}</a></li>
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.blog}</a></li>
+                <li><a href="/guide" className="hover:text-white transition">Kılavuz</a></li>
+                <li><a href="https://github.com/NuraydinArikan/AIClipboardOptimizer" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
+                <li><a href="/contact" className="hover:text-white transition">İletişim</a></li>
               </ul>
             </div>
             <div>
               <p className="font-semibold mb-4">{i18n?.footer?.legal}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.privacy}</a></li>
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.terms}</a></li>
-                <li><a href="#" className="hover:text-white transition">{i18n?.footer?.license}</a></li>
+                <li><a href="mailto:nuraydinarikan@gmail.com" className="hover:text-white transition">Email: nuraydinarikan@gmail.com</a></li>
+                <li><a href="https://github.com/NuraydinArikan" target="_blank" className="hover:text-white transition">GitHub: @NuraydinArikan</a></li>
+                <li><a href="/contact" className="hover:text-white transition">İletişim Formu</a></li>
               </ul>
             </div>
           </div>

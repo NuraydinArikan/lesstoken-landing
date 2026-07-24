@@ -1,0 +1,20 @@
+{
+  "name": "less-token-extension",
+  "version": "1.0.0",
+  "description": "AI-powered browser extension to optimize text and reduce token usage",
+  "scripts": {
+    "dev": "echo 'Extension development - load in Chrome with chrome://extensions/'",
+    "build": "echo 'Extension is ready - zip the extension folder for submission'",
+    "test": "echo 'Add tests here'"
+  },
+  "keywords": [
+    "ai",
+    "clipboard",
+    "optimization",
+    "tokens",
+    "cost-reduction"
+  ],
+  "author": "Less Token Team",
+  "license": "MIT",
+  "devDependencies": {}
+}
