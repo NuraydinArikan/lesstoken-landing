@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { apiUrl } from '../../lib/api';
 
 export default function Auth() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function Auth() {
     try {
       const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(apiUrl(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

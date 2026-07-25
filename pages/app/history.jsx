@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { apiUrl } from '../../lib/api';
 
 export default function History() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function History() {
 
   const loadHistory = async (authToken) => {
     try {
-      const response = await fetch('/api/v1/history?limit=50', {
+      const response = await fetch(apiUrl('/api/v1/history?limit=50'), {
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
 
@@ -41,7 +42,7 @@ export default function History() {
     if (!confirm('Tüm geçmişi silmek istediğinizden emin misiniz?')) return;
 
     try {
-      const response = await fetch('/api/v1/history', {
+      const response = await fetch(apiUrl('/api/v1/history'), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

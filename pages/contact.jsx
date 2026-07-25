@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { apiUrl } from '../lib/api';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ export default function Contact() {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/v1/contact', {
+      const response = await fetch(apiUrl('/api/v1/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

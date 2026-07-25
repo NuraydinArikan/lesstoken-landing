@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { apiUrl } from '../../lib/api';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function Dashboard() {
 
   const loadStats = async (token) => {
     try {
-      const response = await fetch('/api/v1/history?limit=1', {
+      const response = await fetch(apiUrl('/api/v1/history?limit=1'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

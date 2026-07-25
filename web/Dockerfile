@@ -15,10 +15,13 @@ COPY optimizers.py .
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
 
+# Railway injects PORT at runtime; default to 5000 locally.
+ENV PORT=5000
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:5000/api/v1/health')"
+    CMD python -c "import os,requests; requests.get(f\"http://localhost:{os.environ.get('PORT','5000')}/api/v1/health\")"
 
-# Run with gunicorn
+# Run with gunicorn (shell form so $PORT expands)
 EXPOSE 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "-t", "120", "app:app"]
+CMD gunicorn -w 4 -b 0.0.0.0:$PORT -t 120 app:app

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { apiUrl } from '../../lib/api';
 
 export default function Optimize() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Optimize() {
     setStats(null);
 
     try {
-      const response = await fetch('/api/v1/optimize', {
+      const response = await fetch(apiUrl('/api/v1/optimize'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
