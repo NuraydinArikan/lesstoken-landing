@@ -2,26 +2,20 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements-backend.txt .
+# Build context is the repository root (see railway.json), so paths are
+# repo-relative rather than relative to this file.
+COPY web/requirements-backend.txt .
 RUN pip install --no-cache-dir -r requirements-backend.txt
 
-# Copy application
-COPY app.py .
-COPY database.py .
-COPY optimizers.py .
+COPY web/app.py web/database.py web/optimizers.py ./
 
-# Environment
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
 
-# Railway injects PORT at runtime; default to 5000 locally.
-ENV PORT=5000
+# Railway routes the public domain to 8080. It normally injects PORT, but
+# defaulting to 8080 keeps the container correct even when it does not.
+ENV PORT=8080
+EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import os,requests; requests.get(f\"http://localhost:{os.environ.get('PORT','5000')}/api/v1/health\")"
-
-# Run with gunicorn (shell form so $PORT expands)
-EXPOSE 5000
+# Shell form so $PORT expands.
 CMD gunicorn -w 4 -b 0.0.0.0:$PORT -t 120 app:app
