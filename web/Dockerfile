@@ -2,12 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Build context is the repository root (see railway.json), so paths are
-# repo-relative rather than relative to this file.
-COPY web/requirements-backend.txt .
-RUN pip install --no-cache-dir -r requirements-backend.txt
+# Railway's build context has proven ambiguous between the repository root and
+# web/, so copy whatever the context is and locate the backend sources at build
+# time rather than assuming either layout.
+COPY . /src
 
-COPY web/app.py web/database.py web/optimizers.py ./
+RUN set -eux; \
+    echo "--- build context contents ---"; \
+    ls -la /src; \
+    if [ -f /src/web/app.py ]; then SRC=/src/web; else SRC=/src; fi; \
+    echo "--- using backend sources from: $SRC ---"; \
+    cp "$SRC/requirements-backend.txt" "$SRC/app.py" "$SRC/database.py" "$SRC/optimizers.py" /app/; \
+    pip install --no-cache-dir -r /app/requirements-backend.txt; \
+    rm -rf /src
 
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
