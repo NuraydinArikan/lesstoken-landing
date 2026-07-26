@@ -137,5 +137,3 @@ Open source - Same license as Less Token app (MIT)
 ---
 
 **Made with ❤️ for budget-conscious developers**
-
-<!-- deployment pipeline verified 2026-07-26 -->
