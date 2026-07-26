@@ -194,7 +194,7 @@ async function optimizeWithClaude(text, prompt, apiKey) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-opus-4',
+      model: 'claude-opus-5',
       max_tokens: 2000,
       system: prompt,
       messages: [{

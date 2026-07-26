@@ -155,7 +155,7 @@ def optimize_with_claude(text, prompt, api_key):
                 'anthropic-version': '2023-06-01'
             },
             json={
-                'model': 'claude-opus-4',
+                'model': 'claude-opus-5',
                 'max_tokens': 2000,
                 'system': prompt,
                 'messages': [
