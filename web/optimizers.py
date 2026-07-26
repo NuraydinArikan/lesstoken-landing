@@ -105,7 +105,7 @@ def optimize_with_openai(text, prompt, api_key):
                 'Authorization': f'Bearer {api_key}'
             },
             json={
-                'model': 'gpt-4-turbo-preview',
+                'model': 'gpt-4.1',
                 'messages': [
                     {'role': 'system', 'content': prompt},
                     {'role': 'user', 'content': text}
@@ -169,7 +169,16 @@ def optimize_with_claude(text, prompt, api_key):
             raise Exception(f'Claude API error: {response.text}')
 
         data = response.json()
-        optimized = data['content'][0]['text']
+
+        # The model may emit a thinking block before the answer, so pick the
+        # text block rather than assuming it is first.
+        text_blocks = [
+            b for b in data.get('content', []) if b.get('type') == 'text'
+        ]
+        if not text_blocks:
+            raise Exception('Claude returned no text block')
+
+        optimized = text_blocks[0]['text']
         input_tokens = data['usage']['input_tokens']
         output_tokens = data['usage']['output_tokens']
 

@@ -159,7 +159,7 @@ async function optimizeWithOpenAI(text, prompt, apiKey) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4.1',
       messages: [{
         role: 'system',
         content: prompt
@@ -209,8 +209,16 @@ async function optimizeWithClaude(text, prompt, apiKey) {
   }
 
   const data = await response.json();
+
+  // The model may emit a thinking block before the answer, so pick the text
+  // block rather than assuming it is first.
+  const textBlock = (data.content || []).find(b => b.type === 'text');
+  if (!textBlock) {
+    throw new Error('Claude returned no text block');
+  }
+
   return {
-    optimized: data.content[0].text,
+    optimized: textBlock.text,
     inputTokens: data.usage.input_tokens,
     outputTokens: data.usage.output_tokens
   };
