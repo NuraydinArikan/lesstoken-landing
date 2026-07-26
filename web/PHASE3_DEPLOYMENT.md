@@ -446,4 +446,4 @@ psql $DATABASE_URL < backup.sql
 
 **Timeline:** ~2-3 hours for full deployment
 
-**Support:** nuraydinarikan@gmail.com
+**Support:** info@lesstoken.app

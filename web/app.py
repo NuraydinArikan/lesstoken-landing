@@ -5,7 +5,10 @@ REST API for AI text optimization with user authentication
 
 import os
 import json
+import logging
+import smtplib
 from datetime import datetime, timedelta
+from email.message import EmailMessage
 from functools import wraps
 from pathlib import Path
 
@@ -28,11 +31,20 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     'sqlite:///lesstoken.db'
 )
 
+logger = logging.getLogger(__name__)
+
 # Environment variables for AI providers
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
+
+# Outgoing mail for the contact form (Porkbun-hosted mailbox).
+SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.porkbun.com')
+SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
+SMTP_USER = os.getenv('SMTP_USER', 'info@lesstoken.app')
+SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
+CONTACT_TO = os.getenv('CONTACT_TO', SMTP_USER)
 
 # Enable CORS for frontend
 CORS(app, origins=[
@@ -420,38 +432,65 @@ def update_profile(current_user_id):
 # Contact Routes
 # ============================================================================
 
+def _strip_header_newlines(value):
+    """Keep user input out of the header block."""
+    return ' '.join(str(value).splitlines()).strip()
+
+
+def send_contact_email(name, email, subject, message):
+    """Deliver a contact form submission over SMTP.
+
+    Raises on failure so the caller never reports success for a mail that was
+    not actually sent.
+    """
+    if not SMTP_PASSWORD:
+        raise RuntimeError('SMTP_PASSWORD is not configured')
+
+    msg = EmailMessage()
+    msg['Subject'] = f'[lesstoken.app] {_strip_header_newlines(subject)}'
+    msg['From'] = SMTP_USER
+    msg['To'] = CONTACT_TO
+    # Replying goes to the visitor rather than to our own mailbox.
+    msg['Reply-To'] = _strip_header_newlines(email)
+    msg.set_content(
+        f'Gönderen: {_strip_header_newlines(name)} <{_strip_header_newlines(email)}>\n'
+        f'Konu: {_strip_header_newlines(subject)}\n\n'
+        f'{message}\n'
+    )
+
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
+        smtp.starttls()
+        smtp.login(SMTP_USER, SMTP_PASSWORD)
+        smtp.send_message(msg)
+
+
 @app.route('/api/v1/contact', methods=['POST'])
 def contact():
     """Handle contact form submissions"""
+    data = request.get_json(silent=True)
+
+    # Validate input
+    if not data or not data.get('email') or not data.get('message'):
+        return jsonify({'error': 'Email and message are required'}), 400
+
+    name = data.get('name') or 'Ziyaretçi'
+    email = data.get('email')
+    subject = data.get('subject') or 'Bize Ulaşan Mesaj'
+    message = data.get('message')
+
     try:
-        data = request.get_json()
-
-        # Validate input
-        if not data or not data.get('email') or not data.get('message'):
-            return jsonify({'error': 'Email and message are required'}), 400
-
-        name = data.get('name', 'Ziyaretçi')
-        email = data.get('email')
-        subject = data.get('subject', 'Bize Ulaşan Mesaj')
-        message = data.get('message')
-
-        # TODO: Implement email sending (use SendGrid, Mailgun, or Flask-Mail)
-        # Example:
-        # send_email(
-        #     to=CONTACT_EMAIL,
-        #     subject=f"Yeni Mesaj: {subject}",
-        #     body=f"Gönderen: {name} ({email})\n\n{message}"
-        # )
-
-        print(f"Contact form received: {name} <{email}> - {subject}")
-
-        return jsonify({
-            'success': True,
-            'message': 'Mesajınız başarıyla alındı. En kısa sürede dönüş yapılacaktır.'
-        }), 200
-
+        send_contact_email(name, email, subject, message)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.exception('Contact form delivery failed')
+        return jsonify({
+            'error': 'Mesaj gönderilemedi. Lütfen doğrudan '
+                     f'{CONTACT_TO} adresine yazın.'
+        }), 502
+
+    return jsonify({
+        'success': True,
+        'message': 'Mesajınız iletildi. En kısa sürede dönüş yapılacaktır.'
+    }), 200
 
 
 # ============================================================================

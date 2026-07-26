@@ -149,7 +149,7 @@ See how many tokens you've saved across all optimizations with detailed analytic
 - https://lesstoken.app
 
 **Support Email:**
-- nuraydinarikan@gmail.com
+- info@lesstoken.app
 
 **Privacy Policy:**
 ```

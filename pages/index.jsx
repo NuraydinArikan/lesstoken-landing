@@ -389,7 +389,7 @@ function HomeContent() {
             <div>
               <p className="font-semibold mb-4">{i18n?.footer?.legal}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="mailto:nuraydinarikan@gmail.com" className="hover:text-white transition">Email: nuraydinarikan@gmail.com</a></li>
+                <li><a href="mailto:info@lesstoken.app" className="hover:text-white transition">Email: info@lesstoken.app</a></li>
                 <li><a href="https://github.com/NuraydinArikan" target="_blank" className="hover:text-white transition">GitHub: @NuraydinArikan</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim Formu</a></li>
               </ul>

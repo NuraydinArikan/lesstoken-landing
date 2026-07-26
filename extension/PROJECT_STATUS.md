@@ -369,7 +369,7 @@ Week 3 (Polish & Release)
 
 **Bug Reports:** GitHub Issues
 **Feature Requests:** GitHub Discussions
-**Email:** nuraydinarikan@gmail.com
+**Email:** info@lesstoken.app
 **Website:** https://lesstoken.app
 
 ---

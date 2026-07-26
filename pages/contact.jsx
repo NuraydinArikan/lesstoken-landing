@@ -64,8 +64,8 @@ export default function Contact() {
             {/* Email */}
             <div>
               <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>Email</h3>
-              <a href="mailto:nuraydinarikan@gmail.com" style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '16px' }}>
-                nuraydinarikan@gmail.com
+              <a href="mailto:info@lesstoken.app" style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '16px' }}>
+                info@lesstoken.app
               </a>
             </div>
 
