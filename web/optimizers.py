@@ -200,13 +200,16 @@ def optimize_with_claude(text, prompt, api_key):
 # ============================================================================
 
 def optimize_with_gemini(text, prompt, api_key):
-    """Optimize text using Google Gemini Pro"""
+    """Optimize text using Google Gemini"""
     if not api_key:
         raise ValueError('Gemini API key not provided')
 
     try:
+        # Use the floating "latest" alias: pinned versions get retired and
+        # start returning "no longer available to new users".
         response = requests.post(
-            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}',
+            'https://generativelanguage.googleapis.com/v1beta/models/'
+            f'gemini-flash-latest:generateContent?key={api_key}',
             headers={'Content-Type': 'application/json'},
             json={
                 'contents': [{
@@ -215,18 +218,23 @@ def optimize_with_gemini(text, prompt, api_key):
                     }]
                 }]
             },
-            timeout=30
+            timeout=60
         )
 
         if response.status_code != 200:
             raise Exception(f'Gemini API error: {response.text}')
 
         data = response.json()
-        optimized = data['candidates'][0]['content']['parts'][0]['text']
 
-        # Gemini doesn't return token counts, estimate from text
-        input_tokens = len(text.split())
-        output_tokens = len(optimized.split())
+        parts = data['candidates'][0].get('content', {}).get('parts', [])
+        optimized = next((p['text'] for p in parts if 'text' in p), None)
+        if optimized is None:
+            raise Exception('Gemini returned no text part')
+
+        # Real counts are reported, so prefer them over word-count estimates.
+        usage = data.get('usageMetadata', {})
+        input_tokens = usage.get('promptTokenCount', len(text.split()))
+        output_tokens = usage.get('candidatesTokenCount', len(optimized.split()))
 
         return {
             'optimized': optimized,

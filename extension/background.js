@@ -227,7 +227,8 @@ async function optimizeWithClaude(text, prompt, apiKey) {
 // Google Gemini API integration
 async function optimizeWithGemini(text, prompt, apiKey) {
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+    // Floating "latest" alias: pinned versions get retired.
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: {
@@ -248,10 +249,19 @@ async function optimizeWithGemini(text, prompt, apiKey) {
   }
 
   const data = await response.json();
+
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  const part = parts.find(p => typeof p.text === 'string');
+  if (!part) {
+    throw new Error('Gemini returned no text part');
+  }
+
+  // Real counts are reported, so prefer them over word-count estimates.
+  const usage = data.usageMetadata || {};
   return {
-    optimized: data.candidates[0].content.parts[0].text,
-    inputTokens: text.split(/\s+/).length,
-    outputTokens: data.candidates[0].content.parts[0].text.split(/\s+/).length
+    optimized: part.text,
+    inputTokens: usage.promptTokenCount ?? text.split(/\s+/).length,
+    outputTokens: usage.candidatesTokenCount ?? part.text.split(/\s+/).length
   };
 }
 
