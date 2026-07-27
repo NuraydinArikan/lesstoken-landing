@@ -19,7 +19,7 @@ const localesData = {
       multiProvider: { title: "Akıllı Yapay Zeka Seçimi", desc: "ChatGPT, Claude, Gemini, Ollama. En ucuz veya en hızlı yapay zekayı otomatik seç." },
       realtime: { title: "Gerçek Zamanlı İşlem", desc: "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle." },
       costTracking: { title: "Maliyet Takibi", desc: "Kullanılan jetonları (Token), sorgu başına maliyeti, toplam harcamayı tam tarih araması ile takip et." },
-      easySetup: { title: "Kolay Kurulum", desc: "Tek tıkla yükleyici. Ayar gerekmez. Windows'ta çalışır." }
+      easySetup: { title: "Kolay Kurulum", desc: "Tek tıkla bilgisayarına yükle. Ayar gerekmez. Windows'ta çalışır." }
     },
     results: {
       title: "Gerçek Sonuçlar",
@@ -90,7 +90,7 @@ const localesData = {
       multiProvider: { title: "Smart AI Selection", desc: "ChatGPT, Claude, Gemini, Ollama. Automatically pick the cheapest or fastest AI." },
       realtime: { title: "Real-time Processing", desc: "Monitor clipboard, auto-detect content, process instantly with hotkeys." },
       costTracking: { title: "Cost Tracking", desc: "Track tokens used, cost per query and total spending, with full history search." },
-      easySetup: { title: "Easy Setup", desc: "One-click installer. No configuration needed. Works on Windows." }
+      easySetup: { title: "Easy Setup", desc: "Install it on your computer in one click. No configuration needed. Works on Windows." }
     },
     results: {
       title: "Real Results",
