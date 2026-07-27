@@ -72,7 +72,7 @@ export default function Contact() {
             {/* GitHub */}
             <div>
               <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>GitHub</h3>
-              <a href="https://github.com/NuraydinArikan/AIClipboardOptimizer" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '16px' }}>
+              <a href="https://github.com/NuraydinArikan/LessTokenDesktop" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '16px' }}>
                 GitHub Repository
               </a>
             </div>

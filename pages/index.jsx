@@ -5,7 +5,7 @@ import SmartScreenDemo from '../components/SmartScreenDemo';
 // GitHub resolves /releases/latest/download/ to the newest non-prerelease
 // asset, so this survives future releases without an edit here.
 const DOWNLOAD_URL =
-  'https://github.com/NuraydinArikan/AIClipboardOptimizer/releases/latest/download/lesstoken-setup.exe';
+  'https://github.com/NuraydinArikan/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe';
 
 const localesData = {
   tr: {
@@ -468,7 +468,7 @@ function HomeContent() {
               <p className="text-gray-400 text-sm mt-5">
                 {i18n?.smartscreen?.trust}{' '}
                 <a
-                  href="https://github.com/NuraydinArikan/AIClipboardOptimizer"
+                  href="https://github.com/NuraydinArikan/LessTokenDesktop"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 underline"
@@ -542,7 +542,7 @@ function HomeContent() {
               <p className="font-semibold mb-4">{i18n?.footer?.resources}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="/guide" className="hover:text-white transition">Kılavuz</a></li>
-                <li><a href="https://github.com/NuraydinArikan/AIClipboardOptimizer" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
+                <li><a href="https://github.com/NuraydinArikan/LessTokenDesktop" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim</a></li>
               </ul>
             </div>
