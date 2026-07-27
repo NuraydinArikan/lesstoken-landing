@@ -9,7 +9,7 @@ const DOWNLOAD_URL =
 
 const localesData = {
   tr: {
-    nav: { logo: "Less Token", download: "İndir" },
+    nav: { logo: "Less Token", imageTool: "Görsel Küçült", download: "İndir" },
     hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "Less Token ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
     stats: {
       savingsValue: "Yüzde 99",
@@ -88,7 +88,7 @@ const localesData = {
     footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
   en: {
-    nav: { logo: "Less Token", download: "Download" },
+    nav: { logo: "Less Token", imageTool: "Shrink Image", download: "Download" },
     hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with Less Token", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
     stats: {
       savingsValue: "99 percent",
@@ -228,6 +228,12 @@ function HomeContent() {
                 TR
               </button>
             </div>
+            <a
+              href="/image"
+              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+            >
+              {i18n?.nav?.imageTool}
+            </a>
             <a
               href="#download"
               className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold transition"
