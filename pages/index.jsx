@@ -10,13 +10,13 @@ const DOWNLOAD_URL =
 const localesData = {
   tr: {
     nav: { logo: "Less Token", download: "İndir" },
-    hero: { title: "AI Token Kullanımınızı Optimize Edin", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
+    hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "Less Token ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
     stats: { savings: "Token Tasarrufu", reduction: "Boyut Azaltma", providers: "AI Sağlayıcı", pricing: "Açık Kaynak" },
     features: {
       title: "Güçlü Özellikler",
       imageOpt: { title: "Görüntü Optimizasyonu", desc: "Görselleri yeniden boyutlandır, sıkıştır ve metin çıkar. 4000×2500px → 5KB OCR ile." },
       docProcess: { title: "Belge İşleme", desc: "PDF, Word, CSV dosyalarından metin çıkar. Akıllı token tahmini." },
-      multiProvider: { title: "Çok Sağlayıcı", desc: "OpenAI, Claude, Gemini, Ollama. En ucuz veya en hızlı sağlayıcıyı otomatik seç." },
+      multiProvider: { title: "Akıllı Yapay Zeka Seçimi", desc: "ChatGPT, Claude, Gemini, Ollama. En ucuz veya en hızlı yapay zekayı otomatik seç." },
       realtime: { title: "Gerçek Zamanlı İşlem", desc: "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle." },
       costTracking: { title: "Maliyet Takibi", desc: "Kullanılan tokenları, sor başına maliyeti, toplam harcamayı takip et. Tam tarih araması." },
       easySetup: { title: "Kolay Kurulum", desc: "Tek tıkla yükleyici. Ayar gerekmez. Windows'ta çalışır." }
@@ -81,13 +81,13 @@ const localesData = {
   },
   en: {
     nav: { logo: "Less Token", download: "Download" },
-    hero: { title: "Optimize Your AI Token Usage", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
+    hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with Less Token", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
     stats: { savings: "Token Savings", reduction: "Size Reduction", providers: "AI Providers", pricing: "Open Source" },
     features: {
       title: "Powerful Features",
       imageOpt: { title: "Image Optimization", desc: "Resize, compress, and extract text from images. 4000×2500px → 5KB with OCR." },
       docProcess: { title: "Document Processing", desc: "Extract text from PDFs, Word docs, CSV files. Intelligent token estimation." },
-      multiProvider: { title: "Multi-Provider", desc: "OpenAI, Claude, Gemini, Ollama. Auto-select cheapest or fastest provider." },
+      multiProvider: { title: "Smart AI Selection", desc: "ChatGPT, Claude, Gemini, Ollama. Automatically pick the cheapest or fastest AI." },
       realtime: { title: "Real-time Processing", desc: "Monitor clipboard, auto-detect content, process instantly with hotkeys." },
       costTracking: { title: "Cost Tracking", desc: "Track tokens used, costs per prompt, total spending. Full history search." },
       easySetup: { title: "Easy Setup", desc: "One-click installer. No configuration needed. Works on Windows." }
@@ -228,6 +228,9 @@ function HomeContent() {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
             {i18n?.hero?.title}
           </h1>
+          <p className="text-2xl md:text-3xl font-semibold text-blue-200 mb-6">
+            {i18n?.hero?.subtitle}
+          </p>
           <p className="text-xl text-gray-300 mb-8">
             {i18n?.hero?.description}
           </p>
