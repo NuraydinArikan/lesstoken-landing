@@ -11,10 +11,18 @@ const localesData = {
   tr: {
     nav: { logo: "Less Token", download: "İndir" },
     hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "Less Token ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
-    stats: { savings: "Token Tasarrufu", reduction: "Boyut Azaltma", providers: "AI Sağlayıcı", pricing: "Açık Kaynak" },
+    stats: {
+      savingsValue: "Yüzde 99",
+      savings: "Token Tasarrufu",
+      reductionValue: "Yüzde 96",
+      reduction: "Boyut Azaltma",
+      providers: "Çok Sayıda Yapay Zeka Aracından Yararlanma İmkanı",
+      pricingValue: "Ücretsiz",
+      pricing: "Açık Kaynak"
+    },
     features: {
       title: "Güçlü Özellikler",
-      imageOpt: { title: "Görüntü Optimizasyonu", desc: "Görselleri yeniden boyutlandır, sıkıştır ve metin çıkar. 4000×2500px → 5KB OCR ile." },
+      imageOpt: { title: "Görüntü Optimizasyonu", desc: "Görselleri yeniden boyutlandır, sıkıştır ve özet metne dönüştür. 4000×2500px → 5KB OCR ile." },
       docProcess: { title: "Belge İşleme", desc: "PDF, Word, CSV dosyalarını özet metne dönüştür. Jeton tüketimini tahmin et." },
       multiProvider: { title: "Akıllı Yapay Zeka Seçimi", desc: "ChatGPT, Claude, Gemini, Ollama. En ucuz veya en hızlı yapay zekayı otomatik seç." },
       realtime: { title: "Gerçek Zamanlı İşlem", desc: "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle." },
@@ -82,7 +90,15 @@ const localesData = {
   en: {
     nav: { logo: "Less Token", download: "Download" },
     hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with Less Token", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
-    stats: { savings: "Token Savings", reduction: "Size Reduction", providers: "AI Providers", pricing: "Open Source" },
+    stats: {
+      savingsValue: "99 percent",
+      savings: "Token Savings",
+      reductionValue: "96 percent",
+      reduction: "Size Reduction",
+      providers: "Your pick of several AI tools",
+      pricingValue: "Free",
+      pricing: "Open Source"
+    },
     features: {
       title: "Powerful Features",
       imageOpt: { title: "Image Optimization", desc: "Resize, compress, and extract text from images. 4000×2500px → 5KB with OCR." },
@@ -247,21 +263,23 @@ function HomeContent() {
 
       {/* Stats */}
       <section className="py-16 px-6 border-y border-slate-700">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8 items-start">
           <div className="text-center">
-            <p className="text-4xl font-bold text-blue-400 mb-2">99%</p>
+            <p className="text-3xl font-bold text-blue-400 mb-2">{i18n?.stats?.savingsValue}</p>
             <p className="text-gray-400">{i18n?.stats?.savings}</p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-blue-400 mb-2">96%</p>
+            <p className="text-3xl font-bold text-blue-400 mb-2">{i18n?.stats?.reductionValue}</p>
             <p className="text-gray-400">{i18n?.stats?.reduction}</p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-blue-400 mb-2">6+</p>
-            <p className="text-gray-400">{i18n?.stats?.providers}</p>
+            {/* No headline number here: the point is the choice, not a count. */}
+            <p className="text-lg font-semibold text-blue-400 leading-snug">
+              {i18n?.stats?.providers}
+            </p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-blue-400 mb-2">Free</p>
+            <p className="text-3xl font-bold text-blue-400 mb-2">{i18n?.stats?.pricingValue}</p>
             <p className="text-gray-400">{i18n?.stats?.pricing}</p>
           </div>
         </div>
