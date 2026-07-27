@@ -13,17 +13,21 @@ export default function ImageResizePage() {
   const [resized, setResized] = useState(null); // { width, height, bytes }
   const [copyState, setCopyState] = useState('idle'); // idle | copied | failed
   const blobRef = useRef(null);
+  const previewUrlRef = useRef(null);
+  const pasteSeqRef = useRef(0);
 
   useEffect(() => {
     const handlePaste = (event) => {
       const items = event.clipboardData?.items;
       if (!items) return;
 
-      const imageItem = Array.from(items).find((item) => item.type.startsWith('image/'));
+      const imageItem = Array.from(items).find((item) => item.kind === 'file' && item.type.startsWith('image/'));
       if (!imageItem) {
         setStatus('no-image');
         return;
       }
+
+      const mySeq = ++pasteSeqRef.current;
 
       setStatus('processing');
       setPreviewUrl(null);
@@ -31,6 +35,10 @@ export default function ImageResizePage() {
       blobRef.current = null;
 
       const sourceBlob = imageItem.getAsFile();
+      if (!sourceBlob) {
+        setStatus('error');
+        return;
+      }
 
       createImageBitmap(sourceBlob).then((bitmap) => {
         const { width, height } = computeTargetDimensions(bitmap.width, bitmap.height, MAX_WIDTH, MAX_HEIGHT);
@@ -41,6 +49,8 @@ export default function ImageResizePage() {
         canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
 
         canvas.toBlob((resizedBlob) => {
+          if (mySeq !== pasteSeqRef.current) return;
+
           if (!resizedBlob) {
             setStatus('error');
             return;
@@ -48,17 +58,28 @@ export default function ImageResizePage() {
           blobRef.current = resizedBlob;
           setOriginal({ width: bitmap.width, height: bitmap.height, bytes: sourceBlob.size });
           setResized({ width, height, bytes: resizedBlob.size });
-          setPreviewUrl(URL.createObjectURL(resizedBlob));
+          if (previewUrlRef.current) {
+            URL.revokeObjectURL(previewUrlRef.current);
+          }
+          const newPreviewUrl = URL.createObjectURL(resizedBlob);
+          previewUrlRef.current = newPreviewUrl;
+          setPreviewUrl(newPreviewUrl);
           setStatus('done');
           copyToClipboard();
         }, 'image/png');
       }).catch(() => {
+        if (mySeq !== pasteSeqRef.current) return;
         setStatus('error');
       });
     };
 
     document.addEventListener('paste', handlePaste);
-    return () => document.removeEventListener('paste', handlePaste);
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
   }, []);
 
   const pixelReduction = original && resized
@@ -73,6 +94,7 @@ export default function ImageResizePage() {
       ]);
       setCopyState('copied');
     } catch (err) {
+      console.warn('clipboard write failed', err);
       setCopyState('failed');
     }
   };
@@ -81,6 +103,7 @@ export default function ImageResizePage() {
     <>
       <Head>
         <title>Görsel Küçült - Less Token</title>
+        <meta name="description" content="Bir görseli panodan yapıştırın, tarayıcınızda küçültülmüş halini alın. Sunucuya yükleme yok, ücretsiz." />
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
@@ -92,7 +115,6 @@ export default function ImageResizePage() {
         </p>
 
         <div
-          tabIndex={0}
           style={{
             width: '100%',
             maxWidth: '480px',

@@ -230,7 +230,7 @@ function HomeContent() {
             </div>
             <a
               href="/image"
-              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+              className="hidden sm:inline-block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
             >
               {i18n?.nav?.imageTool}
             </a>
