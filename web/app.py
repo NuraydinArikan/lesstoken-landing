@@ -39,12 +39,16 @@ CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
-# Outgoing mail for the contact form (Porkbun-hosted mailbox).
-SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.porkbun.com')
+# Outgoing mail for the contact form.
+# SMTP_USER is the login, which is not necessarily an address: Resend, for
+# example, authenticates as the literal user "resend". Keep the visible From
+# address separate so the two can differ.
+SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.resend.com')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-SMTP_USER = os.getenv('SMTP_USER', 'info@lesstoken.app')
+SMTP_USER = os.getenv('SMTP_USER', 'resend')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
-CONTACT_TO = os.getenv('CONTACT_TO', SMTP_USER)
+MAIL_FROM = os.getenv('MAIL_FROM', 'info@lesstoken.app')
+CONTACT_TO = os.getenv('CONTACT_TO', 'info@lesstoken.app')
 
 # Enable CORS for frontend
 CORS(app, origins=[
@@ -448,7 +452,7 @@ def send_contact_email(name, email, subject, message):
 
     msg = EmailMessage()
     msg['Subject'] = f'[lesstoken.app] {_strip_header_newlines(subject)}'
-    msg['From'] = SMTP_USER
+    msg['From'] = MAIL_FROM
     msg['To'] = CONTACT_TO
     # Replying goes to the visitor rather than to our own mailbox.
     msg['Reply-To'] = _strip_header_newlines(email)
