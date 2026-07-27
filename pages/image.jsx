@@ -7,7 +7,7 @@ const MAX_WIDTH = 1024;
 const MAX_HEIGHT = 768;
 
 export default function ImageResizePage() {
-  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image
+  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | error
   const [previewUrl, setPreviewUrl] = useState(null);
   const [original, setOriginal] = useState(null); // { width, height, bytes }
   const [resized, setResized] = useState(null); // { width, height, bytes }
@@ -39,12 +39,18 @@ export default function ImageResizePage() {
         canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
 
         canvas.toBlob((resizedBlob) => {
+          if (!resizedBlob) {
+            setStatus('error');
+            return;
+          }
           blobRef.current = resizedBlob;
           setOriginal({ width: bitmap.width, height: bitmap.height, bytes: sourceBlob.size });
           setResized({ width, height, bytes: resizedBlob.size });
           setPreviewUrl(URL.createObjectURL(resizedBlob));
           setStatus('done');
         }, 'image/png');
+      }).catch(() => {
+        setStatus('error');
       });
     };
 
@@ -89,6 +95,9 @@ export default function ImageResizePage() {
           {status === 'idle' && <p style={{ color: '#9ca3af' }}>Buraya tıklayıp Ctrl+V ile yapıştırın</p>}
           {status === 'no-image' && (
             <p style={{ color: '#991b1b' }}>Panoda görsel bulunamadı. Bir görsel kopyalayıp tekrar deneyin.</p>
+          )}
+          {status === 'error' && (
+            <p style={{ color: '#991b1b' }}>Görsel işlenemedi. Farklı bir görsel deneyin.</p>
           )}
           {status === 'processing' && <p style={{ color: '#9ca3af' }}>İşleniyor...</p>}
           {status === 'done' && previewUrl && (
