@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Zap, Cloud, BarChart3, Image as ImageIcon, FileText } from 'lucide-react';
+import SmartScreenDemo from '../components/SmartScreenDemo';
 
 // GitHub resolves /releases/latest/download/ to the newest non-prerelease
 // asset, so this survives future releases without an edit here.
@@ -28,6 +29,24 @@ const localesData = {
     },
     pricing: { title: "Basit Fiyatlandırma", free: "Ücretsiz", desc: "Açık kaynak masaüstü uygulaması", features: ["✓ Görüntü ve PDF optimizasyonu", "✓ Çok sağlayıcı desteği", "✓ Gerçek zamanlı pano izleme", "✓ Tam tarih ve analitik", "✓ Windows masaüstü uygulaması"], btn: "Windows için İndir" },
     download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
+    smartscreen: {
+      title: "Windows bir uyarı gösterirse endişelenmeyin",
+      body: "Kurulumu başlatırken Windows \"Kişisel bilgisayarınızı korudu\" ekranını gösterebilir. Bu bir virüs uyarısı değildir. Windows, yayıncısı ücretli bir sertifika satın almamış her uygulama için bu ekranı gösterir — biz de henüz almadık. Devam etmek için:",
+      step1: "Ek bilgi",
+      step2: "Yine de çalıştır",
+      trust: "Merak ederseniz: Less Token açık kaynaktır, kurulumun içindeki her satırı kendiniz okuyabilirsiniz.",
+      trustLink: "Kaynak kodu GitHub'da",
+      demo: {
+        dialogTitle: "Windows kişisel bilgisayarınızı korudu",
+        dialogBody: "Microsoft Defender SmartScreen tanınmayan bir uygulamanın başlamasını engelledi.",
+        more: "Ek bilgi",
+        appLabel: "Uygulama:",
+        publisherLabel: "Yayımcı:",
+        publisherValue: "Bilinmeyen yayımcı",
+        runAnyway: "Yine de çalıştır",
+        dontRun: "Çalıştırma"
+      }
+    },
     faq: {
       title: "Sık Sorulan Sorular",
       items: [
@@ -50,6 +69,10 @@ const localesData = {
         {
           q: "Hangi platformlarda çalışır?",
           a: "Masaüstü uygulaması Windows içindir. Web uygulaması güncel tarayıcıların hepsinde çalışır ve kurulum gerektirmez. Tarayıcı eklentisi Chrome ile Chromium tabanlı tarayıcılar (Edge, Brave) içindir."
+        },
+        {
+          q: "Kurulumda Windows neden uyarı gösteriyor?",
+          a: "Windows, yayıncısı ücretli bir kod imzalama sertifikası satın almamış her uygulama için \"Kişisel bilgisayarınızı korudu\" ekranını gösterir. Bu, dosyada bir sorun bulunduğu anlamına gelmez; yalnızca yayıncının Windows tarafından henüz tanınmadığını söyler. Kuruluma devam etmek için Ek bilgi bağlantısına, ardından Yine de çalıştır düğmesine tıklayın. Uygulama açık kaynak olduğu için kurulumun içine giren kodu GitHub'da inceleyebilirsiniz."
         }
       ]
     },
@@ -77,6 +100,24 @@ const localesData = {
     },
     pricing: { title: "Simple Pricing", free: "Free", desc: "Open source desktop application", features: ["✓ Image & PDF optimization", "✓ Multi-provider support", "✓ Real-time clipboard monitoring", "✓ Full history & analytics", "✓ Windows desktop app"], btn: "Download for Windows" },
     download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
+    smartscreen: {
+      title: "If Windows shows a warning, don't worry",
+      body: "When you start the installer, Windows may show its \"protected your PC\" screen. This is not a virus warning. Windows shows it for every app whose publisher has not bought a paid signing certificate — and we have not bought one yet. To continue:",
+      step1: "More info",
+      step2: "Run anyway",
+      trust: "If you would rather check for yourself: Less Token is open source, so you can read every line that goes into the installer.",
+      trustLink: "Source code on GitHub",
+      demo: {
+        dialogTitle: "Windows protected your PC",
+        dialogBody: "Microsoft Defender SmartScreen prevented an unrecognised app from starting.",
+        more: "More info",
+        appLabel: "App:",
+        publisherLabel: "Publisher:",
+        publisherValue: "Unknown publisher",
+        runAnyway: "Run anyway",
+        dontRun: "Don't run"
+      }
+    },
     faq: {
       title: "FAQ",
       items: [
@@ -99,6 +140,10 @@ const localesData = {
         {
           q: "Which platforms does it run on?",
           a: "The desktop app is for Windows. The web app runs in any current browser and needs no installation. The browser extension is for Chrome and Chromium-based browsers such as Edge and Brave."
+        },
+        {
+          q: "Why does Windows warn me during installation?",
+          a: "Windows shows its \"protected your PC\" screen for every app whose publisher has not bought a paid code signing certificate. It does not mean anything is wrong with the file - only that Windows does not recognise the publisher yet. To continue, click More info and then Run anyway. Since the app is open source, you can inspect exactly what goes into the installer on GitHub."
         }
       ]
     },
@@ -381,6 +426,36 @@ function HomeContent() {
             <a href={DOWNLOAD_URL} className="block text-center w-full bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-bold text-lg transition mt-8">
               {i18n?.download?.btn}
             </a>
+
+            <div className="mt-8 bg-blue-500/10 border border-blue-400/40 rounded-xl p-6">
+              <p className="font-semibold text-blue-200 mb-3">
+                {i18n?.smartscreen?.title}
+              </p>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                {i18n?.smartscreen?.body}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <span className="bg-slate-700 px-3 py-1 rounded">{i18n?.smartscreen?.step1}</span>
+                <span className="text-blue-400">→</span>
+                <span className="bg-slate-700 px-3 py-1 rounded">{i18n?.smartscreen?.step2}</span>
+              </div>
+
+              {i18n?.smartscreen?.demo && (
+                <SmartScreenDemo labels={i18n.smartscreen.demo} />
+              )}
+
+              <p className="text-gray-400 text-sm mt-5">
+                {i18n?.smartscreen?.trust}{' '}
+                <a
+                  href="https://github.com/NuraydinArikan/AIClipboardOptimizer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  {i18n?.smartscreen?.trustLink}
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </section>
