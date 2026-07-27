@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Zap, Cloud, BarChart3, Image as ImageIcon, FileText } from 'lucide-react';
 
+// GitHub resolves /releases/latest/download/ to the newest non-prerelease
+// asset, so this survives future releases without an edit here.
+const DOWNLOAD_URL =
+  'https://github.com/NuraydinArikan/AIClipboardOptimizer/releases/latest/download/lesstoken-setup.exe';
+
 const localesData = {
   tr: {
     nav: { logo: "Less Token", download: "İndir" },
@@ -22,7 +27,7 @@ const localesData = {
       comparison: { title: "Çok Sağlayıcı Karşılaştırması", before: "Öncesi", after: "Sonrası", savings: "%96 Tasarruf", detail: "Aynı sonuç, 24¢ tasarruf" }
     },
     pricing: { title: "Basit Fiyatlandırma", free: "Ücretsiz", desc: "Açık kaynak masaüstü uygulaması", features: ["✓ Görüntü ve PDF optimizasyonu", "✓ Çok sağlayıcı desteği", "✓ Gerçek zamanlı pano izleme", "✓ Tam tarih ve analitik", "✓ Windows masaüstü uygulaması"], btn: "Windows için İndir" },
-    download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (45 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
+    download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
     faq: { title: "Sık Sorulan Sorular", q1: "API anahtarı gerekli mi?", q2: "Verilerim gizli mi?", q3: "Hangi dosya türleri desteklenir?", q4: "Birden fazla AI sağlayıcı kullanabilir miyim?", q5: "CLI versiyonu var mı?" },
     cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
     footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
@@ -47,7 +52,7 @@ const localesData = {
       comparison: { title: "Multi-Provider Comparison", before: "Before", after: "After", savings: "96% Savings", detail: "Same result, 24¢ saved" }
     },
     pricing: { title: "Simple Pricing", free: "Free", desc: "Open source desktop application", features: ["✓ Image & PDF optimization", "✓ Multi-provider support", "✓ Real-time clipboard monitoring", "✓ Full history & analytics", "✓ Windows desktop app"], btn: "Download for Windows" },
-    download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (45 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
+    download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
     faq: { title: "FAQ", q1: "Do I need API keys?", q2: "Is my data private?", q3: "What file types are supported?", q4: "Can I use multiple AI providers?", q5: "Is there a CLI version?" },
     cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
     footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 Less Token. All rights reserved. Made with care for budget-conscious developers." }
@@ -133,12 +138,12 @@ function HomeContent() {
             {i18n?.hero?.description}
           </p>
           <div className="flex gap-4 justify-center">
-            <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold text-lg transition">
+            <a href={DOWNLOAD_URL} className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold text-lg transition">
               {i18n?.hero?.downloadBtn}
-            </button>
-            <button className="border border-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold text-lg transition">
+            </a>
+            <a href="#download" className="border border-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold text-lg transition">
               {i18n?.hero?.learnBtn}
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -291,9 +296,9 @@ function HomeContent() {
                 <li key={i}>{feature}</li>
               ))}
             </ul>
-            <button className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition text-lg">
+            <a href={DOWNLOAD_URL} className="inline-block bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition text-lg">
               {i18n?.pricing?.btn}
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -324,9 +329,9 @@ function HomeContent() {
                 <p className="text-gray-400">{i18n?.download?.step3Desc}</p>
               </div>
             </div>
-            <button className="w-full bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-bold text-lg transition mt-8">
+            <a href={DOWNLOAD_URL} className="block text-center w-full bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-bold text-lg transition mt-8">
               {i18n?.download?.btn}
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -353,9 +358,9 @@ function HomeContent() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">{i18n?.cta?.title}</h2>
           <p className="text-xl text-gray-300 mb-8">{i18n?.cta?.desc}</p>
-          <button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 px-8 py-4 rounded-lg font-bold text-lg transition">
+          <a href={DOWNLOAD_URL} className="inline-block bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 px-8 py-4 rounded-lg font-bold text-lg transition">
             {i18n?.cta?.btn}
-          </button>
+          </a>
         </div>
       </section>
 
