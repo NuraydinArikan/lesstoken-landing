@@ -28,7 +28,31 @@ const localesData = {
     },
     pricing: { title: "Basit Fiyatlandırma", free: "Ücretsiz", desc: "Açık kaynak masaüstü uygulaması", features: ["✓ Görüntü ve PDF optimizasyonu", "✓ Çok sağlayıcı desteği", "✓ Gerçek zamanlı pano izleme", "✓ Tam tarih ve analitik", "✓ Windows masaüstü uygulaması"], btn: "Windows için İndir" },
     download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
-    faq: { title: "Sık Sorulan Sorular", q1: "API anahtarı gerekli mi?", q2: "Verilerim gizli mi?", q3: "Hangi dosya türleri desteklenir?", q4: "Birden fazla AI sağlayıcı kullanabilir miyim?", q5: "CLI versiyonu var mı?" },
+    faq: {
+      title: "Sık Sorulan Sorular",
+      items: [
+        {
+          q: "API anahtarı gerekli mi?",
+          a: "Web uygulamasında hayır — hesap açıp doğrudan kullanmaya başlayabilirsiniz. Masaüstü uygulaması ve tarayıcı eklentisinde ise kendi API anahtarınızı girersiniz; bu sayede metniniz bizim sunucularımıza hiç uğramaz."
+        },
+        {
+          q: "Verilerim gizli mi?",
+          a: "Masaüstü uygulaması ve tarayıcı eklentisinde metniniz sunucularımıza gitmez: doğrudan seçtiğiniz yapay zeka sağlayıcısına gönderilir ve API anahtarınız yalnızca kendi cihazınızda saklanır. Web uygulamasında ise metniniz sunucumuzdan geçer ve geçmiş özelliğini sunabilmek için veritabanımızda saklanır. Hassas içerikler için masaüstü uygulamasını öneririz."
+        },
+        {
+          q: "Hangi dosya türleri desteklenir?",
+          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web uygulaması ve tarayıcı eklentisi şu an yalnızca metin optimize eder."
+        },
+        {
+          q: "Birden fazla AI sağlayıcı kullanabilir miyim?",
+          a: "Evet. OpenAI, Claude ve Google Gemini arasında her optimizasyonda geçiş yapabilirsiniz. Masaüstü uygulaması ayrıca kendi bilgisayarınızda çalışan Ollama'yı destekler; bu durumda metniniz hiçbir buluta gitmez."
+        },
+        {
+          q: "Hangi platformlarda çalışır?",
+          a: "Masaüstü uygulaması Windows içindir. Web uygulaması güncel tarayıcıların hepsinde çalışır ve kurulum gerektirmez. Tarayıcı eklentisi Chrome ile Chromium tabanlı tarayıcılar (Edge, Brave) içindir."
+        }
+      ]
+    },
     cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
     footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
@@ -53,7 +77,31 @@ const localesData = {
     },
     pricing: { title: "Simple Pricing", free: "Free", desc: "Open source desktop application", features: ["✓ Image & PDF optimization", "✓ Multi-provider support", "✓ Real-time clipboard monitoring", "✓ Full history & analytics", "✓ Windows desktop app"], btn: "Download for Windows" },
     download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
-    faq: { title: "FAQ", q1: "Do I need API keys?", q2: "Is my data private?", q3: "What file types are supported?", q4: "Can I use multiple AI providers?", q5: "Is there a CLI version?" },
+    faq: {
+      title: "FAQ",
+      items: [
+        {
+          q: "Do I need an API key?",
+          a: "Not for the web app — create an account and start using it. The desktop app and the browser extension use your own API key instead, which is what keeps your text from ever reaching our servers."
+        },
+        {
+          q: "Is my data private?",
+          a: "In the desktop app and the browser extension your text never reaches our servers: it goes straight to the AI provider you chose, and your API key stays on your own device. In the web app your text does pass through our server and is stored in our database so we can offer the history feature. For sensitive material we recommend the desktop app."
+        },
+        {
+          q: "What file types are supported?",
+          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web app and the browser extension currently optimize text only."
+        },
+        {
+          q: "Can I use multiple AI providers?",
+          a: "Yes. You can switch between OpenAI, Claude and Google Gemini on every optimization. The desktop app also supports Ollama running on your own machine, in which case your text never leaves it."
+        },
+        {
+          q: "Which platforms does it run on?",
+          a: "The desktop app is for Windows. The web app runs in any current browser and needs no installation. The browser extension is for Chrome and Chromium-based browsers such as Edge and Brave."
+        }
+      ]
+    },
     cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
     footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 Less Token. All rights reserved. Made with care for budget-conscious developers." }
   }
@@ -62,6 +110,7 @@ const localesData = {
 function HomeContent() {
   const [lang, setLang] = useState('tr');
   const [i18n, setI18n] = useState(localesData.tr);
+  const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -341,14 +390,24 @@ function HomeContent() {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">{i18n?.faq?.title}</h2>
           <div className="space-y-6">
-            {[i18n?.faq?.q1, i18n?.faq?.q2, i18n?.faq?.q3, i18n?.faq?.q4, i18n?.faq?.q5].map((q, idx) => (
-              <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-                <button className="w-full flex justify-between items-center font-semibold text-lg hover:text-blue-400 transition">
-                  <span>{q}</span>
-                  <span>+</span>
-                </button>
-              </div>
-            ))}
+            {(i18n?.faq?.items || []).map((item, idx) => {
+              const open = openFaq === idx;
+              return (
+                <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+                  <button
+                    onClick={() => setOpenFaq(open ? null : idx)}
+                    aria-expanded={open}
+                    className="w-full flex justify-between items-center gap-4 text-left font-semibold text-lg hover:text-blue-400 transition"
+                  >
+                    <span>{item.q}</span>
+                    <span className="text-2xl leading-none shrink-0">{open ? '−' : '+'}</span>
+                  </button>
+                  {open && (
+                    <p className="mt-4 text-gray-300 leading-relaxed">{item.a}</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
