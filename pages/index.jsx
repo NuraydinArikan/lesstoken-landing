@@ -15,7 +15,7 @@ const localesData = {
     features: {
       title: "Güçlü Özellikler",
       imageOpt: { title: "Görüntü Optimizasyonu", desc: "Görselleri yeniden boyutlandır, sıkıştır ve metin çıkar. 4000×2500px → 5KB OCR ile." },
-      docProcess: { title: "Belge İşleme", desc: "PDF, Word, CSV dosyalarından metin çıkar. Akıllı token tahmini." },
+      docProcess: { title: "Belge İşleme", desc: "PDF, Word, CSV dosyalarını özet metne dönüştür. Jeton tüketimini tahmin et." },
       multiProvider: { title: "Akıllı Yapay Zeka Seçimi", desc: "ChatGPT, Claude, Gemini, Ollama. En ucuz veya en hızlı yapay zekayı otomatik seç." },
       realtime: { title: "Gerçek Zamanlı İşlem", desc: "Panoyu izle, içeriği otomatik algıla, kısayollarla anında işle." },
       costTracking: { title: "Maliyet Takibi", desc: "Kullanılan jetonları (Token), sorgu başına maliyeti, toplam harcamayı tam tarih araması ile takip et." },
@@ -86,7 +86,7 @@ const localesData = {
     features: {
       title: "Powerful Features",
       imageOpt: { title: "Image Optimization", desc: "Resize, compress, and extract text from images. 4000×2500px → 5KB with OCR." },
-      docProcess: { title: "Document Processing", desc: "Extract text from PDFs, Word docs, CSV files. Intelligent token estimation." },
+      docProcess: { title: "Document Processing", desc: "Turn PDF, Word and CSV files into summarised text. Estimate token usage." },
       multiProvider: { title: "Smart AI Selection", desc: "ChatGPT, Claude, Gemini, Ollama. Automatically pick the cheapest or fastest AI." },
       realtime: { title: "Real-time Processing", desc: "Monitor clipboard, auto-detect content, process instantly with hotkeys." },
       costTracking: { title: "Cost Tracking", desc: "Track tokens used, cost per query and total spending, with full history search." },
