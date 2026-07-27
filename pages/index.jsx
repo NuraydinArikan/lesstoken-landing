@@ -36,7 +36,7 @@ const localesData = {
       comparison: { title: "Çok Sağlayıcı Karşılaştırması", before: "Öncesi", after: "Sonrası", savings: "%96 Tasarruf", detail: "Aynı sonuç, 24¢ tasarruf" }
     },
     pricing: { title: "Basit Fiyatlandırma", free: "Ücretsiz", desc: "Açık kaynak masaüstü uygulaması", features: ["✓ Görüntü ve PDF optimizasyonu", "✓ Çok sağlayıcı desteği", "✓ Gerçek zamanlı pano izleme", "✓ Tam tarih ve analitik", "✓ Windows masaüstü uygulaması"], btn: "Windows için İndir" },
-    download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.0)" },
+    download: { title: "30 Saniyede Başla", step1: "Yükleyiciyi İndir", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Çalıştır ve Kur", step2Desc: "İleri, ileri, bitir'i tıkla", step3: "Optimize Etmeye Başla", step3Desc: "Metin/görsel kopyala → Sonuç al", btn: "Windows için İndir (v1.0.2)" },
     smartscreen: {
       title: "Windows bir uyarı gösterirse endişelenmeyin",
       body: "Kurulumu başlatırken Windows \"Kişisel bilgisayarınızı korudu\" ekranını gösterebilir. Bu bir virüs uyarısı değildir. Windows, yayıncısı ücretli bir sertifika satın almamış her uygulama için bu ekranı gösterir — biz de henüz almadık. Devam etmek için:",
@@ -68,7 +68,7 @@ const localesData = {
         },
         {
           q: "Hangi dosya türleri desteklenir?",
-          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web uygulaması ve tarayıcı eklentisi şu an yalnızca metin optimize eder."
+          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve PDF, Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web uygulaması ve tarayıcı eklentisi şu an yalnızca metin optimize eder."
         },
         {
           q: "Birden fazla AI sağlayıcı kullanabilir miyim?",
@@ -115,7 +115,7 @@ const localesData = {
       comparison: { title: "Multi-Provider Comparison", before: "Before", after: "After", savings: "96% Savings", detail: "Same result, 24¢ saved" }
     },
     pricing: { title: "Simple Pricing", free: "Free", desc: "Open source desktop application", features: ["✓ Image & PDF optimization", "✓ Multi-provider support", "✓ Real-time clipboard monitoring", "✓ Full history & analytics", "✓ Windows desktop app"], btn: "Download for Windows" },
-    download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.0)" },
+    download: { title: "Get Started in 30 Seconds", step1: "Download Installer", step1Desc: "lesstoken-setup.exe (23 MB)", step2: "Run & Install", step2Desc: "Click next, next, finish", step3: "Start Optimizing", step3Desc: "Copy text/images → Get results", btn: "Download for Windows (v1.0.2)" },
     smartscreen: {
       title: "If Windows shows a warning, don't worry",
       body: "When you start the installer, Windows may show its \"protected your PC\" screen. This is not a virus warning. Windows shows it for every app whose publisher has not bought a paid signing certificate — and we have not bought one yet. To continue:",
@@ -147,7 +147,7 @@ const localesData = {
         },
         {
           q: "What file types are supported?",
-          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web app and the browser extension currently optimize text only."
+          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from PDF, Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web app and the browser extension currently optimize text only."
         },
         {
           q: "Can I use multiple AI providers?",
