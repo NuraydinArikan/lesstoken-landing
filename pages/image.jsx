@@ -11,6 +11,7 @@ export default function ImageResizePage() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [original, setOriginal] = useState(null); // { width, height, bytes }
   const [resized, setResized] = useState(null); // { width, height, bytes }
+  const [copyState, setCopyState] = useState('idle'); // idle | copied | failed
   const blobRef = useRef(null);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function ImageResizePage() {
 
       setStatus('processing');
       setPreviewUrl(null);
+      setCopyState('idle');
       blobRef.current = null;
 
       const sourceBlob = imageItem.getAsFile();
@@ -48,6 +50,7 @@ export default function ImageResizePage() {
           setResized({ width, height, bytes: resizedBlob.size });
           setPreviewUrl(URL.createObjectURL(resizedBlob));
           setStatus('done');
+          copyToClipboard();
         }, 'image/png');
       }).catch(() => {
         setStatus('error');
@@ -61,6 +64,18 @@ export default function ImageResizePage() {
   const pixelReduction = original && resized
     ? Math.round((1 - (resized.width * resized.height) / (original.width * original.height)) * 100)
     : null;
+
+  const copyToClipboard = async () => {
+    if (!blobRef.current) return;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blobRef.current }),
+      ]);
+      setCopyState('copied');
+    } catch (err) {
+      setCopyState('failed');
+    }
+  };
 
   return (
     <>
@@ -132,6 +147,31 @@ export default function ImageResizePage() {
             <p style={{ fontSize: '12px', color: '#047857', marginTop: '12px' }}>
               Dosya boyutu: {Math.round(original.bytes / 1024)} KB → {Math.round(resized.bytes / 1024)} KB
             </p>
+          </div>
+        )}
+
+        {status === 'done' && (
+          <div style={{ marginTop: '16px', textAlign: 'center' }}>
+            <button
+              type="button"
+              onClick={copyToClipboard}
+              style={{
+                padding: '10px 20px',
+                background: '#f3f4f6',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+              }}
+            >
+              {copyState === 'copied' ? '✓ Kopyalandı' : '📋 Panoya Kopyala'}
+            </button>
+            {copyState === 'failed' && (
+              <p style={{ fontSize: '12px', color: '#991b1b', marginTop: '8px' }}>
+                Otomatik kopyalama başarısız oldu. Yukarıdaki butona tekrar tıklayın.
+              </p>
+            )}
           </div>
         )}
       </div>
