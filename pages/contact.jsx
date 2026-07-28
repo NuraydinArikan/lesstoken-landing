@@ -45,8 +45,8 @@ export default function Contact() {
   return (
     <>
       <Head>
-        <title>İletişim - Less Token</title>
-        <meta name="description" content="Less Token ile iletişime geçin" />
+        <title>İletişim - LessToken</title>
+        <meta name="description" content="LessToken ile iletişime geçin" />
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>

@@ -67,7 +67,7 @@ export default function Optimize() {
   return (
     <>
       <Head>
-        <title>Optimize Et - Less Token</title>
+        <title>Optimize Et - LessToken</title>
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>

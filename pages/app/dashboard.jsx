@@ -57,7 +57,7 @@ export default function Dashboard() {
   return (
     <>
       <Head>
-        <title>Dashboard - Less Token</title>
+        <title>Dashboard - LessToken</title>
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
@@ -70,9 +70,9 @@ export default function Dashboard() {
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.svg" alt="Less Token" style={{ width: '40px', height: '40px' }} />
+              <img src="/logo.svg" alt="LessToken" style={{ width: '40px', height: '40px' }} />
               <div>
-                <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>Less Token</h1>
+                <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>LessToken</h1>
                 <p style={{ fontSize: '12px', opacity: 0.9, margin: '0' }}>AI Token Optimizer</p>
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function Dashboard() {
               Hoş Geldiniz, {user?.email?.split('@')[0]}! 👋
             </h2>
             <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '16px' }}>
-              Less Token, yapay zeka API maliyetlerini azaltmaya yardımcı olan akıllı bir araçtır.
+              LessToken, yapay zeka API maliyetlerini azaltmaya yardımcı olan akıllı bir araçtır.
               Metinlerinizi optimize ederek token kullanımını %99'a kadar azaltabilirsiniz.
             </p>
             <p style={{ color: '#666', lineHeight: '1.6' }}>

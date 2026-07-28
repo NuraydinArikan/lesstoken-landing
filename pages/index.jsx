@@ -6,11 +6,13 @@ import SmartScreenDemo from '../components/SmartScreenDemo';
 // asset, so this survives future releases without an edit here.
 const DOWNLOAD_URL =
   'https://github.com/NuraydinArikan/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe';
+const CHECKSUM_URL =
+  'https://github.com/NuraydinArikan/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe.sha256';
 
 const localesData = {
   tr: {
-    nav: { logo: "Less Token", download: "İndir" },
-    hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "Less Token ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
+    nav: { logo: "LessToken", download: "İndir" },
+    hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "LessToken ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
     stats: {
       savingsValue: "Yüzde 99",
       savings: "Token Tasarrufu",
@@ -42,8 +44,10 @@ const localesData = {
       body: "Kurulumu başlatırken Windows \"Kişisel bilgisayarınızı korudu\" ekranını gösterebilir. Bu bir virüs uyarısı değildir. Windows, yayıncısı ücretli bir sertifika satın almamış her uygulama için bu ekranı gösterir — biz de henüz almadık. Devam etmek için:",
       step1: "Ek bilgi",
       step2: "Yine de çalıştır",
-      trust: "Merak ederseniz: Less Token açık kaynaktır, kurulumun içindeki her satırı kendiniz okuyabilirsiniz.",
+      trust: "Merak ederseniz: LessToken açık kaynaktır, kurulumun içindeki her satırı kendiniz okuyabilirsiniz.",
       trustLink: "Kaynak kodu GitHub'da",
+      checksum: "İndirdiğiniz dosyanın değiştirilmediğinden emin olmak için SHA-256 checksum ile doğrulayın:",
+      checksumLink: "Checksum dosyası",
       demo: {
         dialogTitle: "Windows kişisel bilgisayarınızı korudu",
         dialogBody: "Microsoft Defender SmartScreen tanınmayan bir uygulamanın başlamasını engelledi.",
@@ -85,11 +89,11 @@ const localesData = {
       ]
     },
     cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
-    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 Less Token. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
+    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
   en: {
-    nav: { logo: "Less Token", download: "Download" },
-    hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with Less Token", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
+    nav: { logo: "LessToken", download: "Download" },
+    hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with LessToken", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
     stats: {
       savingsValue: "99 percent",
       savings: "Token Savings",
@@ -121,8 +125,10 @@ const localesData = {
       body: "When you start the installer, Windows may show its \"protected your PC\" screen. This is not a virus warning. Windows shows it for every app whose publisher has not bought a paid signing certificate — and we have not bought one yet. To continue:",
       step1: "More info",
       step2: "Run anyway",
-      trust: "If you would rather check for yourself: Less Token is open source, so you can read every line that goes into the installer.",
+      trust: "If you would rather check for yourself: LessToken is open source, so you can read every line that goes into the installer.",
       trustLink: "Source code on GitHub",
+      checksum: "To make sure the file you downloaded wasn't tampered with, verify it against its SHA-256 checksum:",
+      checksumLink: "Checksum file",
       demo: {
         dialogTitle: "Windows protected your PC",
         dialogBody: "Microsoft Defender SmartScreen prevented an unrecognised app from starting.",
@@ -164,7 +170,7 @@ const localesData = {
       ]
     },
     cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
-    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 Less Token. All rights reserved. Made with care for budget-conscious developers." }
+    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 LessToken. All rights reserved. Made with care for budget-conscious developers." }
   }
 };
 
@@ -476,6 +482,17 @@ function HomeContent() {
                   {i18n?.smartscreen?.trustLink}
                 </a>
               </p>
+              <p className="text-gray-400 text-sm mt-2">
+                {i18n?.smartscreen?.checksum}{' '}
+                <a
+                  href={CHECKSUM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  {i18n?.smartscreen?.checksumLink}
+                </a>
+              </p>
             </div>
           </div>
         </div>
@@ -525,8 +542,8 @@ function HomeContent() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo.svg" alt="Less Token" style={{ width: '32px', height: '32px' }} />
-                <p className="font-bold">Less Token</p>
+                <img src="/logo.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+                <p className="font-bold">LessToken</p>
               </div>
               <p className="text-gray-400 text-sm">{i18n?.footer?.tagline}</p>
             </div>

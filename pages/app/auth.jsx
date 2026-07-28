@@ -62,7 +62,7 @@ export default function Auth() {
   return (
     <>
       <Head>
-        <title>{isLogin ? 'Giriş Yap' : 'Kayıt Ol'} - Less Token</title>
+        <title>{isLogin ? 'Giriş Yap' : 'Kayıt Ol'} - LessToken</title>
       </Head>
 
       <div style={{
@@ -83,9 +83,9 @@ export default function Auth() {
         }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <img src="/logo.svg" alt="Less Token" style={{ width: '60px', height: '60px', marginBottom: '16px' }} />
+            <img src="/logo.svg" alt="LessToken" style={{ width: '60px', height: '60px', marginBottom: '16px' }} />
             <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0369a1', marginBottom: '8px' }}>
-              Less Token
+              LessToken
             </h1>
             <p style={{ color: '#666', fontSize: '14px' }}>
               {isLogin ? 'Hesabınıza giriş yapın' : 'Yeni hesap oluşturun'}

@@ -12,7 +12,7 @@ export default function Guide() {
         {
           number: 1,
           title: 'Uygulamayı İndirin',
-          description: 'Ana sayfadan "İndir" butonuna tıklayarak Less Token kurulum dosyasını indirin.',
+          description: 'Ana sayfadan "İndir" butonuna tıklayarak LessToken kurulum dosyasını indirin.',
           image: '📥'
         },
         {
@@ -24,7 +24,7 @@ export default function Guide() {
         {
           number: 3,
           title: 'Uygulamayı Açın',
-          description: 'Kurulumdan sonra başlat menüsünden veya masaüstü kısayolundan Less Token\'ı açın.',
+          description: 'Kurulumdan sonra başlat menüsünden veya masaüstü kısayolundan LessToken\'ı açın.',
           image: '🚀'
         },
         {
@@ -54,7 +54,7 @@ export default function Guide() {
         {
           number: 1,
           title: 'Eklentiyi Yükleyin',
-          description: 'Chrome Web Store\'dan Less Token eklentisini bulun ve "Chrome\'a Ekle" butonuna tıklayın.',
+          description: 'Chrome Web Store\'dan LessToken eklentisini bulun ve "Chrome\'a Ekle" butonuna tıklayın.',
           image: '🌐'
         },
         {
@@ -205,15 +205,15 @@ export default function Guide() {
   return (
     <>
       <Head>
-        <title>Kullanım Kılavuzu - Less Token</title>
-        <meta name="description" content="Less Token nasıl kullanılır? Adım adım kılavuz." />
+        <title>Kullanım Kılavuzu - LessToken</title>
+        <meta name="description" content="LessToken nasıl kullanılır? Adım adım kılavuz." />
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
         {/* Header */}
         <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '60px 20px', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '12px' }}>Kullanım Kılavuzu</h1>
-          <p style={{ fontSize: '18px', opacity: 0.9 }}>Less Token\'ı adım adım öğrenin</p>
+          <p style={{ fontSize: '18px', opacity: 0.9 }}>LessToken\'ı adım adım öğrenin</p>
         </div>
 
         {/* Content */}

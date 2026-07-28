@@ -59,7 +59,7 @@ export default function History() {
   return (
     <>
       <Head>
-        <title>Geçmiş - Less Token</title>
+        <title>Geçmiş - LessToken</title>
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>

@@ -1,5 +1,5 @@
 """
-Database models and initialization for Less Token Web App
+Database models and initialization for LessToken Web App
 """
 
 from datetime import datetime

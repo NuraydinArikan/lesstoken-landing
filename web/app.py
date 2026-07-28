@@ -1,5 +1,5 @@
 """
-Less Token Web App Backend - Flask API
+LessToken Web App Backend - Flask API
 REST API for AI text optimization with user authentication
 """
 
