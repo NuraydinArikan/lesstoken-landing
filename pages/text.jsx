@@ -79,8 +79,8 @@ export default function TextToolPage() {
   return (
     <>
       <Head>
-        <title>{lang === 'tr' ? 'Metin Aracı - LessToken' : 'Text Tool - LessToken'}</title>
-        <meta name="description" content="AI destekli metin düzeltme, özetleme ve çeviri — tarayıcınızda, üyeliksiz." />
+        <title>{t.pageTitle}</title>
+        <meta name="description" content={t.pageDescription} />
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '40px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
