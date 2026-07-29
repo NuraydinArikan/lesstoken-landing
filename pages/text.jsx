@@ -24,10 +24,10 @@ export default function TextToolPage() {
 
   useEffect(() => {
     setLang(detectLang());
-    const transferred = safeGet(sessionStorage, 'lesstoken.transferText');
+    const transferred = safeGet('session', 'lesstoken.transferText');
     if (transferred) {
       setInput(transferred);
-      safeRemove(sessionStorage, 'lesstoken.transferText');
+      safeRemove('session', 'lesstoken.transferText');
     }
   }, []);
 

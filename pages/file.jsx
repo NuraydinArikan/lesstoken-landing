@@ -54,7 +54,7 @@ export default function FileToolPage() {
 
   const sendToText = () => {
     if (!text.trim()) return;
-    safeSet(sessionStorage, 'lesstoken.transferText', text);
+    safeSet('session', 'lesstoken.transferText', text);
     router.push('/text');
   };
 

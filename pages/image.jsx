@@ -173,7 +173,7 @@ export default function ImageResizePage() {
               <div>
                 <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>{t.statPixelReduction}</p>
                 <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#059669', margin: '4px 0 0 0' }}>
-                  %{pixelReduction}
+                  {t.pixelReductionFormat(pixelReduction)}
                 </p>
               </div>
             </div>
