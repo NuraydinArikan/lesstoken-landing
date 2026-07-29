@@ -1,12 +1,15 @@
 // pages/image.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
+import ToolNav from '../components/ToolNav';
 import { computeTargetDimensions } from '../lib/imageResize';
+import { detectLang } from '../lib/toolI18n';
 
 const MAX_WIDTH = 1024;
 const MAX_HEIGHT = 768;
 
 export default function ImageResizePage() {
+  const [lang, setLang] = useState('tr');
   const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | error
   const [previewUrl, setPreviewUrl] = useState(null);
   const [original, setOriginal] = useState(null); // { width, height, bytes }
@@ -15,6 +18,10 @@ export default function ImageResizePage() {
   const blobRef = useRef(null);
   const previewUrlRef = useRef(null);
   const pasteSeqRef = useRef(0);
+
+  useEffect(() => {
+    setLang(detectLang());
+  }, []);
 
   useEffect(() => {
     const handlePaste = (event) => {
@@ -106,6 +113,9 @@ export default function ImageResizePage() {
         <meta name="description" content="Bir görseli panodan yapıştırın, tarayıcınızda küçültülmüş halini alın. Sunucuya yükleme yok, ücretsiz." />
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
+        <div style={{ width: '100%', maxWidth: '860px' }}>
+          <ToolNav lang={lang} active="image" />
+        </div>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
           Görsel Küçült
         </h1>
