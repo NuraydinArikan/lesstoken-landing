@@ -5,13 +5,13 @@ import SmartScreenDemo from '../components/SmartScreenDemo';
 // GitHub resolves /releases/latest/download/ to the newest non-prerelease
 // asset, so this survives future releases without an edit here.
 const DOWNLOAD_URL =
-  'https://github.com/NuraydinArikan/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe';
+  'https://github.com/LessTokenApp/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe';
 const CHECKSUM_URL =
-  'https://github.com/NuraydinArikan/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe.sha256';
+  'https://github.com/LessTokenApp/LessTokenDesktop/releases/latest/download/lesstoken-setup.exe.sha256';
 
 const localesData = {
   tr: {
-    nav: { logo: "LessToken", download: "İndir" },
+    nav: { logo: "LessToken", imageTool: "Görsel Küçült", download: "İndir" },
     hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "LessToken ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
     stats: {
       savingsValue: "Yüzde 99",
@@ -92,7 +92,7 @@ const localesData = {
     footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
   en: {
-    nav: { logo: "LessToken", download: "Download" },
+    nav: { logo: "LessToken", imageTool: "Shrink Image", download: "Download" },
     hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with LessToken", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
     stats: {
       savingsValue: "99 percent",
@@ -234,6 +234,12 @@ function HomeContent() {
                 TR
               </button>
             </div>
+            <a
+              href="/image"
+              className="hidden sm:inline-block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+            >
+              {i18n?.nav?.imageTool}
+            </a>
             <a
               href="#download"
               className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold transition"
@@ -474,7 +480,7 @@ function HomeContent() {
               <p className="text-gray-400 text-sm mt-5">
                 {i18n?.smartscreen?.trust}{' '}
                 <a
-                  href="https://github.com/NuraydinArikan/LessTokenDesktop"
+                  href="https://github.com/LessTokenApp/LessTokenDesktop"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 underline"
@@ -559,7 +565,7 @@ function HomeContent() {
               <p className="font-semibold mb-4">{i18n?.footer?.resources}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="/guide" className="hover:text-white transition">Kılavuz</a></li>
-                <li><a href="https://github.com/NuraydinArikan/LessTokenDesktop" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
+                <li><a href="https://github.com/LessTokenApp/LessTokenDesktop" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim</a></li>
               </ul>
             </div>
@@ -567,7 +573,7 @@ function HomeContent() {
               <p className="font-semibold mb-4">{i18n?.footer?.legal}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="mailto:info@lesstoken.app" className="hover:text-white transition">Email: info@lesstoken.app</a></li>
-                <li><a href="https://github.com/NuraydinArikan" target="_blank" className="hover:text-white transition">GitHub: @NuraydinArikan</a></li>
+                <li><a href="https://github.com/LessTokenApp" target="_blank" className="hover:text-white transition">GitHub: @LessTokenApp</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim Formu</a></li>
               </ul>
             </div>
