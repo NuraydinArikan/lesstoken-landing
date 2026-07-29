@@ -582,7 +582,7 @@ function HomeContent() {
               <p className="font-semibold mb-4">{i18n?.footer?.resources}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="/guide" className="hover:text-white transition">Kılavuz</a></li>
-                <li><a href="https://github.com/LessTokenApp/LessTokenDesktop" target="_blank" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
+                <li><a href="https://github.com/LessTokenApp/LessTokenDesktop" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">{i18n?.footer?.github}</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim</a></li>
               </ul>
             </div>
@@ -590,7 +590,7 @@ function HomeContent() {
               <p className="font-semibold mb-4">{i18n?.footer?.legal}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="mailto:info@lesstoken.app" className="hover:text-white transition">Email: info@lesstoken.app</a></li>
-                <li><a href="https://github.com/LessTokenApp" target="_blank" className="hover:text-white transition">GitHub: @LessTokenApp</a></li>
+                <li><a href="https://github.com/LessTokenApp" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub: @LessTokenApp</a></li>
                 <li><a href="/contact" className="hover:text-white transition">İletişim Formu</a></li>
               </ul>
             </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toolLocales } from '../lib/toolI18n';
+import { safeGet } from '../lib/safeStorage';
 
 const PROVIDERS = [
   { value: 'openai', label: 'OpenAI' },
@@ -14,8 +15,8 @@ export default function AiSettings({ lang = 'tr', onChange }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const storedProvider = localStorage.getItem('lesstoken.provider') || 'openai';
-    const storedKey = localStorage.getItem('lesstoken.apiKey') || '';
+    const storedProvider = safeGet(localStorage, 'lesstoken.provider') || 'openai';
+    const storedKey = safeGet(localStorage, 'lesstoken.apiKey') || '';
     setProvider(storedProvider);
     setApiKey(storedKey);
     onChange?.({ provider: storedProvider, apiKey: storedKey });

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import ToolNav from '../components/ToolNav';
 import { computeTargetDimensions } from '../lib/imageResize';
-import { detectLang } from '../lib/toolI18n';
+import { toolLocales, detectLang } from '../lib/toolI18n';
 
 const MAX_WIDTH = 1024;
 const MAX_HEIGHT = 768;
@@ -18,6 +18,8 @@ export default function ImageResizePage() {
   const blobRef = useRef(null);
   const previewUrlRef = useRef(null);
   const pasteSeqRef = useRef(0);
+
+  const t = toolLocales[lang].image;
 
   useEffect(() => {
     setLang(detectLang());
@@ -109,19 +111,18 @@ export default function ImageResizePage() {
   return (
     <>
       <Head>
-        <title>Görsel Küçült - LessToken</title>
-        <meta name="description" content="Bir görseli panodan yapıştırın, tarayıcınızda küçültülmüş halini alın. Sunucuya yükleme yok, ücretsiz." />
+        <title>{t.pageTitle}</title>
+        <meta name="description" content={t.pageDescription} />
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
         <div style={{ width: '100%', maxWidth: '860px' }}>
           <ToolNav lang={lang} active="image" />
         </div>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
-          Görsel Küçült
+          {t.title}
         </h1>
         <p style={{ color: '#666', marginBottom: '30px', textAlign: 'center', maxWidth: '480px' }}>
-          Bir görseli kopyalayın (ekran görüntüsü, resim vb.) ve buraya yapıştırın (Ctrl+V).
-          Sunucuya hiçbir şey yüklenmez, işlem tamamen tarayıcınızda yapılır.
+          {t.intro}
         </p>
 
         <div
@@ -139,16 +140,16 @@ export default function ImageResizePage() {
             textAlign: 'center',
           }}
         >
-          {status === 'idle' && <p style={{ color: '#9ca3af' }}>Buraya tıklayıp Ctrl+V ile yapıştırın</p>}
+          {status === 'idle' && <p style={{ color: '#9ca3af' }}>{t.statusIdle}</p>}
           {status === 'no-image' && (
-            <p style={{ color: '#991b1b' }}>Panoda görsel bulunamadı. Bir görsel kopyalayıp tekrar deneyin.</p>
+            <p style={{ color: '#991b1b' }}>{t.statusNoImage}</p>
           )}
           {status === 'error' && (
-            <p style={{ color: '#991b1b' }}>Görsel işlenemedi. Farklı bir görsel deneyin.</p>
+            <p style={{ color: '#991b1b' }}>{t.statusError}</p>
           )}
-          {status === 'processing' && <p style={{ color: '#9ca3af' }}>İşleniyor...</p>}
+          {status === 'processing' && <p style={{ color: '#9ca3af' }}>{t.statusProcessing}</p>}
           {status === 'done' && previewUrl && (
-            <img src={previewUrl} alt="Küçültülmüş görsel önizleme" style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }} />
+            <img src={previewUrl} alt={t.previewAlt} style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }} />
           )}
         </div>
 
@@ -164,20 +165,20 @@ export default function ImageResizePage() {
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>Boyut</p>
+                <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>{t.statSize}</p>
                 <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#059669', margin: '4px 0 0 0' }}>
                   {original.width}×{original.height} → {resized.width}×{resized.height}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>Piksel Azaltma</p>
+                <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>{t.statPixelReduction}</p>
                 <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#059669', margin: '4px 0 0 0' }}>
                   %{pixelReduction}
                 </p>
               </div>
             </div>
             <p style={{ fontSize: '12px', color: '#047857', marginTop: '12px' }}>
-              Dosya boyutu: {Math.round(original.bytes / 1024)} KB → {Math.round(resized.bytes / 1024)} KB
+              {t.statFileSize}: {Math.round(original.bytes / 1024)} KB → {Math.round(resized.bytes / 1024)} KB
             </p>
           </div>
         )}
@@ -197,11 +198,11 @@ export default function ImageResizePage() {
                 fontWeight: '600',
               }}
             >
-              {copyState === 'copied' ? '✓ Kopyalandı' : '📋 Panoya Kopyala'}
+              {copyState === 'copied' ? t.copied : t.copy}
             </button>
             {copyState === 'failed' && (
               <p style={{ fontSize: '12px', color: '#991b1b', marginTop: '8px' }}>
-                Otomatik kopyalama başarısız oldu. Yukarıdaki butona tekrar tıklayın.
+                {t.copyFailed}
               </p>
             )}
           </div>

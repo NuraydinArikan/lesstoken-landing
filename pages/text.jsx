@@ -5,6 +5,9 @@ import AiSettings from '../components/AiSettings';
 import { toolLocales, detectLang } from '../lib/toolI18n';
 import { OPERATIONS, runOperation } from '../lib/aiClient.mjs';
 import { localClean } from '../lib/localText.mjs';
+import { safeGet, safeRemove } from '../lib/safeStorage';
+
+const MAX_INPUT_CHARS = 20000;
 
 export default function TextToolPage() {
   const [lang, setLang] = useState('tr');
@@ -21,10 +24,10 @@ export default function TextToolPage() {
 
   useEffect(() => {
     setLang(detectLang());
-    const transferred = sessionStorage.getItem('lesstoken.transferText');
+    const transferred = safeGet(sessionStorage, 'lesstoken.transferText');
     if (transferred) {
       setInput(transferred);
-      sessionStorage.removeItem('lesstoken.transferText');
+      safeRemove(sessionStorage, 'lesstoken.transferText');
     }
   }, []);
 
@@ -35,6 +38,11 @@ export default function TextToolPage() {
     if (!source) {
       setOutput('');
       setNote(t.emptyInput);
+      return;
+    }
+    if (source.length > MAX_INPUT_CHARS) {
+      setOutput('');
+      setNote(t.tooLong);
       return;
     }
     if (!settings.apiKey) {
@@ -131,7 +139,7 @@ export default function TextToolPage() {
             rows={8}
             style={{ width: '100%', marginTop: '6px', marginBottom: '12px', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', fontFamily: 'inherit', background: 'white' }}
           />
-          <button type="button" onClick={copyResult} disabled={!output} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#f3f4f6', cursor: 'pointer', fontWeight: 600 }}>
+          <button type="button" onClick={copyResult} disabled={!output} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#f3f4f6', cursor: 'pointer', fontWeight: 600, opacity: !output ? 0.6 : 1 }}>
             {copied ? `✓ ${t.copied}` : t.copy}
           </button>
         </div>

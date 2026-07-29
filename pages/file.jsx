@@ -3,14 +3,16 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import ToolNav from '../components/ToolNav';
 import { toolLocales, detectLang } from '../lib/toolI18n';
+import { safeSet } from '../lib/safeStorage';
 
 const TEXT_EXTENSIONS = ['txt', 'md'];
+const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
 export default function FileToolPage() {
   const router = useRouter();
   const [lang, setLang] = useState('tr');
   const [text, setText] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | reading | done | error | unsupported
+  const [status, setStatus] = useState('idle'); // idle | reading | done | error | unsupported | toolarge
   const inputRef = useRef(null);
 
   const t = toolLocales[lang].file;
@@ -21,6 +23,10 @@ export default function FileToolPage() {
 
   const readFile = async (file) => {
     if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      setStatus('toolarge');
+      return;
+    }
     const ext = (file.name.split('.').pop() || '').toLowerCase();
     setStatus('reading');
     try {
@@ -48,7 +54,7 @@ export default function FileToolPage() {
 
   const sendToText = () => {
     if (!text.trim()) return;
-    sessionStorage.setItem('lesstoken.transferText', text);
+    safeSet(sessionStorage, 'lesstoken.transferText', text);
     router.push('/text');
   };
 
@@ -59,8 +65,10 @@ export default function FileToolPage() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'lesstoken.txt';
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 
   return (
@@ -88,6 +96,7 @@ export default function FileToolPage() {
             {status === 'reading' && <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>{t.reading}</p>}
             {status === 'unsupported' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.unsupported}</p>}
             {status === 'error' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.readError}</p>}
+            {status === 'toolarge' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.tooLarge}</p>}
           </div>
 
           <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.textLabel}</label>
@@ -99,10 +108,10 @@ export default function FileToolPage() {
             style={{ width: '100%', marginTop: '6px', marginBottom: '12px', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', fontFamily: 'inherit', background: 'white' }}
           />
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <button type="button" onClick={sendToText} disabled={!text.trim()} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
+            <button type="button" onClick={sendToText} disabled={!text.trim()} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer', opacity: !text.trim() ? 0.6 : 1 }}>
               {t.toText}
             </button>
-            <button type="button" onClick={download} disabled={!text.trim()} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#f3f4f6', cursor: 'pointer', fontWeight: 600 }}>
+            <button type="button" onClick={download} disabled={!text.trim()} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#f3f4f6', cursor: 'pointer', fontWeight: 600, opacity: !text.trim() ? 0.6 : 1 }}>
               {t.download}
             </button>
             <button type="button" onClick={() => { setText(''); setStatus('idle'); }} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #d1d5db', background: 'white', cursor: 'pointer' }}>
