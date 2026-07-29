@@ -102,7 +102,7 @@ export default function ImageResizePage() {
   return (
     <>
       <Head>
-        <title>Görsel Küçült - Less Token</title>
+        <title>Görsel Küçült - LessToken</title>
         <meta name="description" content="Bir görseli panodan yapıştırın, tarayıcınızda küçültülmüş halini alın. Sunucuya yükleme yok, ücretsiz." />
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
