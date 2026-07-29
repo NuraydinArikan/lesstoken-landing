@@ -11,7 +11,7 @@ const CHECKSUM_URL =
 
 const localesData = {
   tr: {
-    nav: { logo: "LessToken", imageTool: "Görsel Küçült", download: "İndir" },
+    nav: { logo: "LessToken", tools: "Araçlar", textTool: "Metin", imageTool: "Görsel", fileTool: "Dosya", download: "İndir" },
     hero: { title: "Yapay Zeka Kotalarınız Hemen Tükenmesin", subtitle: "LessToken ile AI Token Kullanımınızı Azaltın", description: "Görsel ve belge boyutlarını çok hızlı küçültün. Yüzde 99'a kadar token tüketimini azaltın. Yapay zeka API maliyetlerinden tasarruf edin.", downloadBtn: "Şimdi İndir", learnBtn: "Daha Fazla Bilgi" },
     stats: {
       savingsValue: "Yüzde 99",
@@ -89,10 +89,10 @@ const localesData = {
       ]
     },
     cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
-    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
+    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", textTool: "Metin", imageTool: "Görsel", fileTool: "Dosya", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
   en: {
-    nav: { logo: "LessToken", imageTool: "Shrink Image", download: "Download" },
+    nav: { logo: "LessToken", tools: "Tools", textTool: "Text", imageTool: "Image", fileTool: "File", download: "Download" },
     hero: { title: "Don't Burn Through Your AI Quota", subtitle: "Cut your token usage with LessToken", description: "Reduce token consumption by up to 99%, slash AI API costs, and process images & documents instantly.", downloadBtn: "Download Now", learnBtn: "Learn More" },
     stats: {
       savingsValue: "99 percent",
@@ -170,7 +170,7 @@ const localesData = {
       ]
     },
     cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
-    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 LessToken. All rights reserved. Made with care for budget-conscious developers." }
+    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", textTool: "Text", imageTool: "Image", fileTool: "File", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 LessToken. All rights reserved. Made with care for budget-conscious developers." }
   }
 };
 
@@ -234,12 +234,26 @@ function HomeContent() {
                 TR
               </button>
             </div>
-            <a
-              href="/image"
-              className="hidden sm:inline-block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
-            >
-              {i18n?.nav?.imageTool}
-            </a>
+            <div className="hidden sm:flex items-center gap-1">
+              <a
+                href="/text"
+                className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+              >
+                {i18n?.nav?.textTool}
+              </a>
+              <a
+                href="/image"
+                className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+              >
+                {i18n?.nav?.imageTool}
+              </a>
+              <a
+                href="/file"
+                className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
+              >
+                {i18n?.nav?.fileTool}
+              </a>
+            </div>
             <a
               href="#download"
               className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold transition"
@@ -556,6 +570,9 @@ function HomeContent() {
             <div>
               <p className="font-semibold mb-4">{i18n?.footer?.product}</p>
               <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="/text" className="hover:text-white transition">{i18n?.footer?.textTool}</a></li>
+                <li><a href="/image" className="hover:text-white transition">{i18n?.footer?.imageTool}</a></li>
+                <li><a href="/file" className="hover:text-white transition">{i18n?.footer?.fileTool}</a></li>
                 <li><a href="#" className="hover:text-white transition">{i18n?.footer?.features}</a></li>
                 <li><a href="#" className="hover:text-white transition">{i18n?.footer?.pricingLink}</a></li>
                 <li><a href="#" className="hover:text-white transition">{i18n?.footer?.downloadLink}</a></li>
