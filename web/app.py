@@ -6,12 +6,11 @@ REST API for AI text optimization with user authentication
 import os
 import json
 import logging
-import smtplib
 from datetime import datetime, timedelta
-from email.message import EmailMessage
 from functools import wraps
 from pathlib import Path
 
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -49,14 +48,13 @@ OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 MAX_TEXT_CHARS = 20000
 DAILY_OPTIMIZE_LIMIT = 20
 
-# Outgoing mail for the contact form.
-# SMTP_USER is the login, which is not necessarily an address: Resend, for
-# example, authenticates as the literal user "resend". Keep the visible From
-# address separate so the two can differ.
-SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.resend.com')
-SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-SMTP_USER = os.getenv('SMTP_USER', 'resend')
-SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
+# Outgoing mail for the contact form, via Resend's HTTP API rather than raw
+# SMTP: Railway's outbound network blocks SMTP ports (25/465/587), so a
+# socket-level smtplib connection to smtp.resend.com times out every time.
+# The API travels over regular HTTPS and isn't affected.
+# Falls back to SMTP_PASSWORD so the key already set on Railway keeps working
+# without renaming the variable there.
+RESEND_API_KEY = os.getenv('RESEND_API_KEY') or os.getenv('SMTP_PASSWORD')
 MAIL_FROM = os.getenv('MAIL_FROM', 'info@lesstoken.app')
 CONTACT_TO = os.getenv('CONTACT_TO', 'info@lesstoken.app')
 
@@ -474,30 +472,33 @@ def _strip_header_newlines(value):
 
 
 def send_contact_email(name, email, subject, message):
-    """Deliver a contact form submission over SMTP.
+    """Deliver a contact form submission via the Resend HTTP API.
 
     Raises on failure so the caller never reports success for a mail that was
     not actually sent.
     """
-    if not SMTP_PASSWORD:
-        raise RuntimeError('SMTP_PASSWORD is not configured')
+    if not RESEND_API_KEY:
+        raise RuntimeError('RESEND_API_KEY is not configured')
 
-    msg = EmailMessage()
-    msg['Subject'] = f'[lesstoken.app] {_strip_header_newlines(subject)}'
-    msg['From'] = MAIL_FROM
-    msg['To'] = CONTACT_TO
-    # Replying goes to the visitor rather than to our own mailbox.
-    msg['Reply-To'] = _strip_header_newlines(email)
-    msg.set_content(
+    body = (
         f'Gönderen: {_strip_header_newlines(name)} <{_strip_header_newlines(email)}>\n'
         f'Konu: {_strip_header_newlines(subject)}\n\n'
         f'{message}\n'
     )
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
-        smtp.starttls()
-        smtp.login(SMTP_USER, SMTP_PASSWORD)
-        smtp.send_message(msg)
+    response = requests.post(
+        'https://api.resend.com/emails',
+        headers={'Authorization': f'Bearer {RESEND_API_KEY}'},
+        json={
+            'from': MAIL_FROM,
+            'to': [CONTACT_TO],
+            'reply_to': _strip_header_newlines(email),
+            'subject': f'[lesstoken.app] {_strip_header_newlines(subject)}',
+            'text': body,
+        },
+        timeout=20,
+    )
+    response.raise_for_status()
 
 
 @app.route('/api/v1/contact', methods=['POST'])
