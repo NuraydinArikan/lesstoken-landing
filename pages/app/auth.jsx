@@ -9,6 +9,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,6 +30,7 @@ export default function Auth() {
     setLoading(true);
     setError('');
     setNeedsVerification(false);
+    setResendSent(false);
 
     try {
       const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
@@ -68,6 +71,20 @@ export default function Auth() {
       setError('Bağlantı hatası: ' + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    try {
+      await fetch(apiUrl('/api/v1/auth/resend-verification'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      setResendSent(true);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -123,8 +140,30 @@ export default function Auth() {
               <p style={{ color: '#166534', marginBottom: '20px' }}>
                 E-postanızı kontrol edin ve doğrulama bağlantısına tıklayın.
               </p>
+              {resendSent ? (
+                <p style={{ color: '#0369a1', fontSize: '14px', marginBottom: '16px' }}>
+                  Doğrulama bağlantısı tekrar gönderildi.
+                </p>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#0369a1',
+                    cursor: resendLoading ? 'not-allowed' : 'pointer',
+                    fontWeight: 600,
+                    display: 'block',
+                    margin: '0 auto 12px',
+                    opacity: resendLoading ? 0.7 : 1
+                  }}
+                >
+                  {resendLoading ? 'Gönderiliyor...' : 'Doğrulama bağlantısını tekrar gönder'}
+                </button>
+              )}
               <button
-                onClick={() => setNeedsVerification(false)}
+                onClick={() => { setNeedsVerification(false); setResendSent(false); }}
                 style={{ background: 'none', border: 'none', color: '#0369a1', cursor: 'pointer' }}
               >
                 Geri dön
