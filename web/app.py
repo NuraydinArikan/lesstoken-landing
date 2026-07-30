@@ -218,7 +218,7 @@ def verify():
     db = get_db()
     user = db.query(User).filter_by(verification_token=token).first()
 
-    if not user or user.verification_token_expires < datetime.utcnow():
+    if not user or not user.verification_token_expires or user.verification_token_expires < datetime.utcnow():
         return jsonify({'error': 'Link geçersiz veya süresi dolmuş'}), 400
 
     user.email_verified = True
