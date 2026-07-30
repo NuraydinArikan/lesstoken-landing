@@ -211,7 +211,58 @@ def test_verify_accepts_a_valid_token(client):
     with app_module.app.app_context():
         refreshed = db.session.query(User).filter_by(email="pending@example.com").first()
         assert refreshed.email_verified is True
-        assert refreshed.verification_token is None
+        # The token is deliberately NOT cleared - see
+        # test_verify_is_idempotent_for_a_repeat_request_with_the_same_token
+        # for why (email-link security scanners GET the link before the
+        # human does, and would otherwise consume it).
+        assert refreshed.verification_token == "valid-token"
+
+
+def test_verify_is_idempotent_for_a_repeat_request_with_the_same_token(client):
+    """Email security scanners (Outlook Safe Links, Proofpoint, etc.) GET
+    verification links automatically before the human clicks them. A second
+    GET with the same valid token - whether from a scanner-then-human or a
+    double-click - must succeed again (fresh JWT), not 400."""
+    with app_module.app.app_context():
+        user = User(
+            email="scanned@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+            verification_token="scanner-token",
+            verification_token_expires=datetime.utcnow() + timedelta(hours=1),
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    first = client.get("/api/v1/auth/verify?token=scanner-token")
+    assert first.status_code == 200
+    assert "token" in first.get_json()
+
+    second = client.get("/api/v1/auth/verify?token=scanner-token")
+    assert second.status_code == 200
+    assert "token" in second.get_json()
+
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="scanned@example.com").first()
+        assert refreshed.email_verified is True
+
+
+def test_verify_still_rejects_a_stale_link_after_the_token_naturally_expires(client):
+    """Even for an already-verified account, a token past its 24h expiry must
+    still 400 - the idempotency fix must not bypass the expiry check."""
+    with app_module.app.app_context():
+        user = User(
+            email="stale@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=True,
+            verification_token="stale-token",
+            verification_token_expires=datetime.utcnow() - timedelta(hours=1),
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.get("/api/v1/auth/verify?token=stale-token")
+    assert response.status_code == 400
 
 
 _GENERIC_RESEND_MESSAGE = "Eğer bu e-posta kayıtlıysa, doğrulama bağlantısı gönderildi"

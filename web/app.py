@@ -221,10 +221,17 @@ def verify():
     if not user or not user.verification_token_expires or user.verification_token_expires < datetime.utcnow():
         return jsonify({'error': 'Link geçersiz veya süresi dolmuş'}), 400
 
-    user.email_verified = True
-    user.verification_token = None
-    user.verification_token_expires = None
-    db.commit()
+    # Deliberately don't clear verification_token/verification_token_expires
+    # on success: automated email-link scanners (Outlook Safe Links,
+    # Proofpoint, etc.) GET this link before the human ever clicks it. If the
+    # token were consumed here, that scanner's request would burn it, and the
+    # real user's click would then 400 on an account that's actually already
+    # verified. Leaving the token in place makes a repeat GET with the same
+    # token idempotent - it just re-issues a JWT - while the 24h expiry check
+    # above still rejects a genuinely stale/expired link.
+    if not user.email_verified:
+        user.email_verified = True
+        db.commit()
 
     token = jwt.encode(
         {
