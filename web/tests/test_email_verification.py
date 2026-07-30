@@ -19,6 +19,7 @@ os.environ["RESEND_API_KEY"] = "test-resend-key"
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
+from werkzeug.security import generate_password_hash as generate_password_hash_for_test
 
 import app as app_module
 from database import db, User
@@ -129,3 +130,41 @@ def test_register_rolls_back_the_user_if_the_email_fails_to_send(client, monkeyp
     assert response.status_code == 502
     with app_module.app.app_context():
         assert db.session.query(User).filter_by(email="new@example.com").first() is None
+
+
+def test_login_rejects_an_unverified_account(client):
+    with app_module.app.app_context():
+        user = User(
+            email="unverified@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "unverified@example.com", "password": "hunter22"},
+    )
+
+    assert response.status_code == 403
+    assert response.get_json()["code"] == "email_not_verified"
+
+
+def test_login_allows_a_verified_account(client):
+    with app_module.app.app_context():
+        user = User(
+            email="verified@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=True,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "verified@example.com", "password": "hunter22"},
+    )
+
+    assert response.status_code == 200
+    assert "token" in response.get_json()

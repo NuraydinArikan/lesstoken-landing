@@ -179,6 +179,12 @@ def login():
         if not user or not check_password_hash(user.password, password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
+        if not user.email_verified:
+            return jsonify({
+                'error': 'E-posta adresiniz doğrulanmamış',
+                'code': 'email_not_verified'
+            }), 403
+
         # Generate token
         token = jwt.encode(
             {
