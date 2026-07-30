@@ -8,6 +8,8 @@ import { toolLocales, detectLang } from '../lib/toolI18n';
 
 const MAX_WIDTH = 1024;
 const MAX_HEIGHT = 768;
+// Matches the desktop app's default image quality.
+const JPEG_QUALITY = 0.8;
 
 export default function ImageResizePage() {
   const [lang, setLang] = useState('tr');
@@ -17,6 +19,8 @@ export default function ImageResizePage() {
   const [original, setOriginal] = useState(null); // { width, height, bytes }
   const [resized, setResized] = useState(null); // { width, height, bytes }
   const [copyState, setCopyState] = useState('idle'); // idle | copied | failed
+  const [jpegBytes, setJpegBytes] = useState(null);
+  const jpegBlobRef = useRef(null);
   const blobRef = useRef(null);
   const previewUrlRef = useRef(null);
   // Guards against an earlier, slower image finishing after a newer one and
@@ -38,7 +42,9 @@ export default function ImageResizePage() {
       setStatus('processing');
       setPreviewUrl(null);
       setCopyState('idle');
+      setJpegBytes(null);
       blobRef.current = null;
+      jpegBlobRef.current = null;
 
       createImageBitmap(sourceBlob).then((bitmap) => {
         const { width, height } = computeTargetDimensions(bitmap.width, bitmap.height, MAX_WIDTH, MAX_HEIGHT);
@@ -48,6 +54,11 @@ export default function ImageResizePage() {
         canvas.height = height;
         canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
 
+        // Two encodings of the same shrunk pixels. PNG is not a preference:
+        // the clipboard refuses everything else (ClipboardItem.supports
+        // reports false for jpeg/webp), and re-encoding a photo as PNG can
+        // land above the original. JPEG is offered as a download so saving a
+        // file is not stuck with that.
         canvas.toBlob((resizedBlob) => {
           if (mySeq !== jobSeqRef.current) return;
 
@@ -66,6 +77,12 @@ export default function ImageResizePage() {
           setPreviewUrl(newPreviewUrl);
           setStatus('done');
           copyToClipboard();
+
+          canvas.toBlob((jpegBlob) => {
+            if (mySeq !== jobSeqRef.current || !jpegBlob) return;
+            jpegBlobRef.current = jpegBlob;
+            setJpegBytes(jpegBlob.size);
+          }, 'image/jpeg', JPEG_QUALITY);
         }, 'image/png');
       }).catch(() => {
         if (mySeq !== jobSeqRef.current) return;
@@ -116,6 +133,16 @@ export default function ImageResizePage() {
   const pixelReduction = original && resized
     ? Math.round((1 - (resized.width * resized.height) / (original.width * original.height)) * 100)
     : null;
+
+  const downloadJpeg = () => {
+    if (!jpegBlobRef.current || !resized) return;
+    const url = URL.createObjectURL(jpegBlobRef.current);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lesstoken-${resized.width}x${resized.height}.jpg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const copyToClipboard = async () => {
     if (!blobRef.current) return;
@@ -247,9 +274,17 @@ export default function ImageResizePage() {
                 </p>
               </div>
             </div>
-            <p style={{ fontSize: '12px', color: '#047857', marginTop: '12px' }}>
-              {t.statFileSize}: {Math.round(original.bytes / 1024)} KB → {Math.round(resized.bytes / 1024)} KB
-            </p>
+            <div style={{ marginTop: '12px', fontSize: '12px', color: '#047857' }}>
+              {jpegBytes !== null && (
+                <p style={{ margin: 0 }}>
+                  {t.statDownloadSize}: {Math.round(original.bytes / 1024)} KB → <strong>{Math.round(jpegBytes / 1024)} KB</strong>
+                </p>
+              )}
+              <p style={{ margin: '4px 0 0 0' }}>
+                {t.statClipboardSize}: {Math.round(resized.bytes / 1024)} KB
+                {resized.bytes > original.bytes && ` — ${t.pngLargerNote}`}
+              </p>
+            </div>
           </div>
         )}
 
@@ -270,6 +305,24 @@ export default function ImageResizePage() {
             >
               {copyState === 'copied' ? t.copied : t.copy}
             </button>
+            {jpegBytes !== null && (
+              <button
+                type="button"
+                onClick={downloadJpeg}
+                style={{
+                  padding: '10px 20px',
+                  marginLeft: '10px',
+                  background: '#f3f4f6',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                }}
+              >
+                {t.downloadJpeg}
+              </button>
+            )}
             {copyState === 'failed' && (
               <p style={{ fontSize: '12px', color: '#991b1b', marginTop: '8px' }}>
                 {t.copyFailed}
