@@ -212,3 +212,92 @@ def test_verify_accepts_a_valid_token(client):
         refreshed = db.session.query(User).filter_by(email="pending@example.com").first()
         assert refreshed.email_verified is True
         assert refreshed.verification_token is None
+
+
+_GENERIC_RESEND_MESSAGE = "Eğer bu e-posta kayıtlıysa, doğrulama bağlantısı gönderildi"
+
+
+def test_resend_verification_gives_the_same_message_for_an_unknown_email(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    response = client.post(
+        "/api/v1/auth/resend-verification", json={"email": "nobody@example.com"}
+    )
+
+    assert response.status_code == 200
+    assert _GENERIC_RESEND_MESSAGE in response.get_json()["message"]
+
+
+def test_resend_verification_gives_the_same_message_for_an_already_verified_account(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="verified2@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=True,
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/resend-verification", json={"email": "verified2@example.com"}
+    )
+
+    assert response.status_code == 200
+    assert _GENERIC_RESEND_MESSAGE in response.get_json()["message"]
+
+
+def test_resend_verification_issues_a_fresh_token_for_a_pending_account(client, monkeypatch):
+    captured = {}
+    monkeypatch.setattr(
+        app_module,
+        "send_verification_email",
+        lambda to_email, token: captured.update(to_email=to_email, token=token),
+    )
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="pending2@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+            verification_token="old-token",
+            verification_token_expires=datetime.utcnow() - timedelta(hours=25),
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/resend-verification", json={"email": "pending2@example.com"}
+    )
+
+    assert response.status_code == 200
+    assert captured["to_email"] == "pending2@example.com"
+    assert captured["token"] != "old-token"
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="pending2@example.com").first()
+        assert refreshed.verification_token == captured["token"]
+        assert refreshed.verification_token_expires > datetime.utcnow()
+
+
+def test_resend_verification_is_rate_limited_to_once_per_60_seconds(client, monkeypatch):
+    captured = []
+    monkeypatch.setattr(
+        app_module,
+        "send_verification_email",
+        lambda to_email, token: captured.append(token),
+    )
+    with app_module.app.app_context():
+        # expires 24h from "just now" -> this account was sent a link seconds ago
+        db.session.add(User(
+            email="pending3@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+            verification_token="recent-token",
+            verification_token_expires=datetime.utcnow() + timedelta(hours=24),
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/resend-verification", json={"email": "pending3@example.com"}
+    )
+
+    assert response.status_code == 200
+    assert _GENERIC_RESEND_MESSAGE in response.get_json()["message"]
+    assert captured == []  # no email actually sent - rate limited

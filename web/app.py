@@ -245,6 +245,47 @@ def verify():
     }), 200
 
 
+RESEND_COOLDOWN_SECONDS = 60
+
+
+@app.route('/api/v1/auth/resend-verification', methods=['POST'])
+def resend_verification():
+    """Re-send a verification link. Always returns the same message so the
+    response never reveals whether an email is registered."""
+    generic_response = jsonify({
+        'message': 'Eğer bu e-posta kayıtlıysa, doğrulama bağlantısı gönderildi'
+    }), 200
+
+    data = request.get_json(silent=True)
+    if not data or not data.get('email'):
+        return generic_response
+
+    email = data.get('email').lower().strip()
+    db = get_db()
+    user = db.query(User).filter_by(email=email).first()
+
+    if not user or user.email_verified:
+        return generic_response
+
+    if user.verification_token_expires:
+        issued_at = user.verification_token_expires - timedelta(hours=24)
+        seconds_since_issued = (datetime.utcnow() - issued_at).total_seconds()
+        if seconds_since_issued < RESEND_COOLDOWN_SECONDS:
+            return generic_response
+
+    token = secrets.token_urlsafe(32)
+    user.verification_token = token
+    user.verification_token_expires = datetime.utcnow() + timedelta(hours=24)
+    db.commit()
+
+    try:
+        send_verification_email(email, token)
+    except Exception:
+        logger.exception('Resend verification email delivery failed')
+
+    return generic_response
+
+
 # ============================================================================
 # Optimization Routes
 # ============================================================================
