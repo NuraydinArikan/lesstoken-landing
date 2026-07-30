@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import ToolNav from '../components/ToolNav';
 import { computeTargetDimensions } from '../lib/imageResize';
+import { classifyFile } from '../lib/imageInput.mjs';
 import { toolLocales, detectLang } from '../lib/toolI18n';
 
 const MAX_WIDTH = 1024;
@@ -10,14 +11,18 @@ const MAX_HEIGHT = 768;
 
 export default function ImageResizePage() {
   const [lang, setLang] = useState('tr');
-  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | error
+  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | not-image | error
+  const [dragging, setDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [original, setOriginal] = useState(null); // { width, height, bytes }
   const [resized, setResized] = useState(null); // { width, height, bytes }
   const [copyState, setCopyState] = useState('idle'); // idle | copied | failed
   const blobRef = useRef(null);
   const previewUrlRef = useRef(null);
-  const pasteSeqRef = useRef(0);
+  // Guards against an earlier, slower image finishing after a newer one and
+  // overwriting its result. Shared by every input path.
+  const jobSeqRef = useRef(0);
+  const fileInputRef = useRef(null);
 
   const t = toolLocales[lang].image;
 
@@ -25,29 +30,15 @@ export default function ImageResizePage() {
     setLang(detectLang());
   }, []);
 
-  useEffect(() => {
-    const handlePaste = (event) => {
-      const items = event.clipboardData?.items;
-      if (!items) return;
-
-      const imageItem = Array.from(items).find((item) => item.kind === 'file' && item.type.startsWith('image/'));
-      if (!imageItem) {
-        setStatus('no-image');
-        return;
-      }
-
-      const mySeq = ++pasteSeqRef.current;
+  // Every way of supplying an image - paste, file picker, drag and drop -
+  // funnels through here, so they all shrink, preview and copy identically.
+  const processBlob = (sourceBlob) => {
+      const mySeq = ++jobSeqRef.current;
 
       setStatus('processing');
       setPreviewUrl(null);
       setCopyState('idle');
       blobRef.current = null;
-
-      const sourceBlob = imageItem.getAsFile();
-      if (!sourceBlob) {
-        setStatus('error');
-        return;
-      }
 
       createImageBitmap(sourceBlob).then((bitmap) => {
         const { width, height } = computeTargetDimensions(bitmap.width, bitmap.height, MAX_WIDTH, MAX_HEIGHT);
@@ -58,7 +49,7 @@ export default function ImageResizePage() {
         canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
 
         canvas.toBlob((resizedBlob) => {
-          if (mySeq !== pasteSeqRef.current) return;
+          if (mySeq !== jobSeqRef.current) return;
 
           if (!resizedBlob) {
             setStatus('error');
@@ -77,9 +68,40 @@ export default function ImageResizePage() {
           copyToClipboard();
         }, 'image/png');
       }).catch(() => {
-        if (mySeq !== pasteSeqRef.current) return;
+        if (mySeq !== jobSeqRef.current) return;
         setStatus('error');
       });
+  };
+
+  // Rejects non-images up front so the picker and drag-drop fail with a clear
+  // message instead of a generic decode error.
+  const handleFile = (file) => {
+    const verdict = classifyFile(file);
+    if (verdict === 'ignore') return;
+    if (verdict === 'not-image') {
+      setStatus('not-image');
+      return;
+    }
+    processBlob(file);
+  };
+
+  useEffect(() => {
+    const handlePaste = (event) => {
+      const items = event.clipboardData?.items;
+      if (!items) return;
+
+      const imageItem = Array.from(items).find((item) => item.kind === 'file' && item.type.startsWith('image/'));
+      if (!imageItem) {
+        setStatus('no-image');
+        return;
+      }
+
+      const sourceBlob = imageItem.getAsFile();
+      if (!sourceBlob) {
+        setStatus('error');
+        return;
+      }
+      processBlob(sourceBlob);
     };
 
     document.addEventListener('paste', handlePaste);
@@ -126,31 +148,79 @@ export default function ImageResizePage() {
         </p>
 
         <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            handleFile(e.dataTransfer.files?.[0]);
+          }}
           style={{
             width: '100%',
             maxWidth: '480px',
             minHeight: '200px',
-            border: '2px dashed #9ca3af',
+            border: `2px dashed ${dragging ? '#2563eb' : '#9ca3af'}`,
             borderRadius: '12px',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'white',
+            gap: '14px',
+            background: dragging ? '#eff6ff' : 'white',
             padding: '20px',
             textAlign: 'center',
           }}
         >
-          {status === 'idle' && <p style={{ color: '#9ca3af' }}>{t.statusIdle}</p>}
           {status === 'no-image' && (
-            <p style={{ color: '#991b1b' }}>{t.statusNoImage}</p>
+            <p style={{ color: '#991b1b', margin: 0 }}>{t.statusNoImage}</p>
+          )}
+          {status === 'not-image' && (
+            <p style={{ color: '#991b1b', margin: 0 }}>{t.statusNotImage}</p>
           )}
           {status === 'error' && (
-            <p style={{ color: '#991b1b' }}>{t.statusError}</p>
+            <p style={{ color: '#991b1b', margin: 0 }}>{t.statusError}</p>
           )}
-          {status === 'processing' && <p style={{ color: '#9ca3af' }}>{t.statusProcessing}</p>}
+          {status === 'processing' && <p style={{ color: '#9ca3af', margin: 0 }}>{t.statusProcessing}</p>}
           {status === 'done' && previewUrl && (
             <img src={previewUrl} alt={t.previewAlt} style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }} />
           )}
+
+          {status !== 'processing' && (
+            <div>
+              {status !== 'done' && (
+                <p style={{ color: '#9ca3af', margin: '0 0 12px 0' }}>{t.statusIdle}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#2563eb',
+                  color: 'white',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                {t.selectFile}
+              </button>
+              <p style={{ fontSize: '13px', color: '#6b7280', margin: '10px 0 0 0' }}>{t.dropHint}</p>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              handleFile(e.target.files?.[0]);
+              // Lets the same file be picked again after a reset.
+              e.target.value = '';
+            }}
+          />
         </div>
 
         {status === 'done' && original && resized && (
