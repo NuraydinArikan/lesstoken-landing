@@ -64,15 +64,15 @@ const localesData = {
       items: [
         {
           q: "API anahtarı gerekli mi?",
-          a: "Web uygulamasında hayır — hesap açıp doğrudan kullanmaya başlayabilirsiniz. Masaüstü uygulaması ve tarayıcı eklentisinde ise kendi API anahtarınızı girersiniz; bu sayede metniniz bizim sunucularımıza hiç uğramaz."
+          a: "Web araçlarında (Metin, Görsel, Dosya) hesap gerekmez; kendi API anahtarınızı girersiniz ve anahtar yalnızca tarayıcınızda kalır. Görsel küçültme ile dosyadan metin çıkarma anahtarsız da çalışır. Masaüstü uygulaması ve tarayıcı eklentisinde de kendi anahtarınızı kullanırsınız; bu sayede metniniz bizim sunucularımıza hiç uğramaz."
         },
         {
           q: "Verilerim gizli mi?",
-          a: "Masaüstü uygulaması ve tarayıcı eklentisinde metniniz sunucularımıza gitmez: doğrudan seçtiğiniz yapay zeka sağlayıcısına gönderilir ve API anahtarınız yalnızca kendi cihazınızda saklanır. Web uygulamasında ise metniniz sunucumuzdan geçer ve geçmiş özelliğini sunabilmek için veritabanımızda saklanır. Hassas içerikler için masaüstü uygulamasını öneririz."
+          a: "Masaüstü uygulaması, tarayıcı eklentisi ve web araçlarında (Metin, Görsel, Dosya) metniniz sunucularımıza gitmez: doğrudan seçtiğiniz yapay zeka sağlayıcısına gönderilir ve API anahtarınız yalnızca kendi cihazınızda saklanır. Görsel küçültme ile dosyadan metin çıkarma tamamen tarayıcınızda yapılır, hiçbir yere yüklenmez. Yalnızca hesap açarak kullanılan eski web panelinde metniniz sunucumuzdan geçer ve geçmiş özelliği için veritabanımızda saklanır."
         },
         {
           q: "Hangi dosya türleri desteklenir?",
-          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve PDF, Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web uygulaması ve tarayıcı eklentisi şu an yalnızca metin optimize eder."
+          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve PDF, Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web araçları görsel küçültmeyi ve TXT, Markdown ile Word (.docx) dosyalarından metin çıkarmayı destekler. Tarayıcı eklentisi şu an yalnızca metin optimize eder."
         },
         {
           q: "Birden fazla AI sağlayıcı kullanabilir miyim?",
@@ -145,15 +145,15 @@ const localesData = {
       items: [
         {
           q: "Do I need an API key?",
-          a: "Not for the web app — create an account and start using it. The desktop app and the browser extension use your own API key instead, which is what keeps your text from ever reaching our servers."
+          a: "The web tools (Text, Image, File) need no account: you supply your own API key and it stays in your browser. Image shrinking and file text extraction work without a key at all. The desktop app and the browser extension also use your own key, which is what keeps your text from ever reaching our servers."
         },
         {
           q: "Is my data private?",
-          a: "In the desktop app and the browser extension your text never reaches our servers: it goes straight to the AI provider you chose, and your API key stays on your own device. In the web app your text does pass through our server and is stored in our database so we can offer the history feature. For sensitive material we recommend the desktop app."
+          a: "In the desktop app, the browser extension and the web tools (Text, Image, File) your text never reaches our servers: it goes straight to the AI provider you chose, and your API key stays on your own device. Image shrinking and file text extraction happen entirely in your browser and are never uploaded. Only the older account-based web dashboard passes your text through our server and stores it in our database for the history feature."
         },
         {
           q: "What file types are supported?",
-          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from PDF, Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web app and the browser extension currently optimize text only."
+          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from PDF, Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web tools support image shrinking and text extraction from TXT, Markdown and Word (.docx) files. The browser extension currently optimizes text only."
         },
         {
           q: "Can I use multiple AI providers?",
