@@ -10,6 +10,7 @@ requests==2.31.0
 packaging==23.1
 python-dotenv==1.0.0
 gunicorn==21.2.0
+Flask-Migrate==4.1.0
 
 # PostgreSQL driver, used when DATABASE_URL points at Railway Postgres.
 psycopg2-binary==2.9.9

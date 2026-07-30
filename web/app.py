@@ -13,11 +13,12 @@ from pathlib import Path
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 # Local imports (will create these)
-from database import init_db, get_db, User, OptimizationHistory
+from database import init_db, get_db, db, User, OptimizationHistory
 from optimizers import optimize_text_with_provider
 
 # Initialize Flask app
@@ -67,6 +68,7 @@ CORS(app, origins=[
 
 # Initialize database
 init_db(app)
+migrate = Migrate(app, db)
 
 # ============================================================================
 # Authentication Middleware
