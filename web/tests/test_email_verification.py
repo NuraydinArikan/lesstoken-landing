@@ -168,3 +168,47 @@ def test_login_allows_a_verified_account(client):
 
     assert response.status_code == 200
     assert "token" in response.get_json()
+
+
+def test_verify_rejects_an_unknown_token(client):
+    response = client.get("/api/v1/auth/verify?token=does-not-exist")
+    assert response.status_code == 400
+
+
+def test_verify_rejects_an_expired_token(client):
+    with app_module.app.app_context():
+        user = User(
+            email="expired@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+            verification_token="expired-token",
+            verification_token_expires=datetime.utcnow() - timedelta(hours=1),
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.get("/api/v1/auth/verify?token=expired-token")
+    assert response.status_code == 400
+
+
+def test_verify_accepts_a_valid_token(client):
+    with app_module.app.app_context():
+        user = User(
+            email="pending@example.com",
+            password=generate_password_hash_for_test("hunter22"),
+            email_verified=False,
+            verification_token="valid-token",
+            verification_token_expires=datetime.utcnow() + timedelta(hours=1),
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    response = client.get("/api/v1/auth/verify?token=valid-token")
+
+    assert response.status_code == 200
+    assert "token" in response.get_json()
+
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="pending@example.com").first()
+        assert refreshed.email_verified is True
+        assert refreshed.verification_token is None

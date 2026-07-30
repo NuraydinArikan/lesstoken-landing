@@ -208,6 +208,43 @@ def login():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/v1/auth/verify', methods=['GET'])
+def verify():
+    """Confirm a signup verification link and log the user in"""
+    token = request.args.get('token')
+    if not token:
+        return jsonify({'error': 'Token is required'}), 400
+
+    db = get_db()
+    user = db.query(User).filter_by(verification_token=token).first()
+
+    if not user or user.verification_token_expires < datetime.utcnow():
+        return jsonify({'error': 'Link geçersiz veya süresi dolmuş'}), 400
+
+    user.email_verified = True
+    user.verification_token = None
+    user.verification_token_expires = None
+    db.commit()
+
+    token = jwt.encode(
+        {
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(days=30)
+        },
+        app.config['SECRET_KEY'],
+        algorithm='HS256'
+    )
+
+    return jsonify({
+        'message': 'E-posta doğrulandı',
+        'token': token,
+        'user': {
+            'id': user.id,
+            'email': user.email
+        }
+    }), 200
+
+
 # ============================================================================
 # Optimization Routes
 # ============================================================================
