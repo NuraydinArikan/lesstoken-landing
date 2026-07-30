@@ -39,6 +39,16 @@ CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
+# This endpoint bills our own API keys, not the caller's, so both limits below
+# guard against real money leaking out: MAX_TEXT_CHARS stops a single oversized
+# request (the 20,000-char cap on the /text page is client-side only - a
+# direct API call could otherwise send arbitrarily large text), and
+# DAILY_OPTIMIZE_LIMIT stops unlimited requests from one free, unverified
+# account. Checked in the database rather than in-memory because gunicorn
+# runs 4 worker processes that don't share memory.
+MAX_TEXT_CHARS = 20000
+DAILY_OPTIMIZE_LIMIT = 10
+
 # Outgoing mail for the contact form.
 # SMTP_USER is the login, which is not necessarily an address: Resend, for
 # example, authenticates as the literal user "resend". Keep the visible From
@@ -211,6 +221,11 @@ def optimize(current_user_id):
         provider = data.get('provider', 'openai')
         style = data.get('style', 'general')
 
+        if len(text) > MAX_TEXT_CHARS:
+            return jsonify({
+                'error': f'Text is too long ({len(text)} chars). Maximum is {MAX_TEXT_CHARS} characters.'
+            }), 400
+
         # Validate provider
         if provider not in ['openai', 'claude', 'gemini', 'ollama']:
             return jsonify({'error': 'Invalid provider'}), 400
@@ -218,6 +233,24 @@ def optimize(current_user_id):
         # Validate style
         if style not in ['general', 'technical', 'marketing', 'academic']:
             style = 'general'
+
+        # Daily quota, counted from history rather than an in-memory counter
+        # so it's correct across all 4 gunicorn workers.
+        db = get_db()
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        requests_today = db.query(OptimizationHistory).filter(
+            OptimizationHistory.user_id == current_user_id,
+            OptimizationHistory.created_at >= today_start
+        ).count()
+        if requests_today >= DAILY_OPTIMIZE_LIMIT:
+            return jsonify({
+                'error': (
+                    f'Daily free limit reached ({DAILY_OPTIMIZE_LIMIT} requests). '
+                    'For unlimited use with your own API key, try the desktop app '
+                    'or the web tools at lesstoken.app/text.'
+                ),
+                'code': 'daily_limit_reached'
+            }), 429
 
         # Get appropriate API key
         api_key = None
@@ -241,7 +274,6 @@ def optimize(current_user_id):
         )
 
         # Save to history
-        db = get_db()
         history_entry = OptimizationHistory(
             user_id=current_user_id,
             input_text=text,
