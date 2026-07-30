@@ -503,6 +503,36 @@ def send_contact_email(name, email, subject, message):
     response.raise_for_status()
 
 
+def send_verification_email(to_email, token):
+    """Email a signup verification link via the Resend HTTP API.
+
+    Raises on failure so the caller can roll back the new user row instead
+    of leaving an account that can never be verified.
+    """
+    if not RESEND_API_KEY:
+        raise RuntimeError('RESEND_API_KEY is not configured')
+
+    link = f'https://lesstoken.app/app/verify?token={token}'
+    body = (
+        'LessToken hesabınızı doğrulamak için:\n'
+        f'{link}\n\n'
+        'Bu bağlantı 24 saat geçerlidir.\n'
+    )
+
+    response = requests.post(
+        'https://api.resend.com/emails',
+        headers={'Authorization': f'Bearer {RESEND_API_KEY}'},
+        json={
+            'from': MAIL_FROM,
+            'to': [to_email],
+            'subject': 'LessToken - E-posta Doğrulama',
+            'text': body,
+        },
+        timeout=20,
+    )
+    response.raise_for_status()
+
+
 @app.route('/api/v1/contact', methods=['POST'])
 def contact():
     """Handle contact form submissions"""
