@@ -6,6 +6,7 @@ REST API for AI text optimization with user authentication
 import os
 import json
 import logging
+import secrets
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -113,7 +114,7 @@ def token_required(f):
 
 @app.route('/api/v1/auth/register', methods=['POST'])
 def register():
-    """Register a new user"""
+    """Register a new user and email them a verification link"""
     try:
         data = request.get_json()
 
@@ -130,31 +131,30 @@ def register():
         if existing_user:
             return jsonify({'error': 'Email already registered'}), 409
 
-        # Create new user
+        # Create new, unverified user
+        token = secrets.token_urlsafe(32)
         user = User(
             email=email,
-            password=generate_password_hash(password)
+            password=generate_password_hash(password),
+            email_verified=False,
+            verification_token=token,
+            verification_token_expires=datetime.utcnow() + timedelta(hours=24)
         )
         db.add(user)
         db.commit()
 
-        # Generate token
-        token = jwt.encode(
-            {
-                'user_id': user.id,
-                'exp': datetime.utcnow() + timedelta(days=30)
-            },
-            app.config['SECRET_KEY'],
-            algorithm='HS256'
-        )
+        try:
+            send_verification_email(email, token)
+        except Exception:
+            logger.exception('Verification email delivery failed')
+            db.delete(user)
+            db.commit()
+            return jsonify({
+                'error': 'Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin.'
+            }), 502
 
         return jsonify({
-            'message': 'User registered successfully',
-            'token': token,
-            'user': {
-                'id': user.id,
-                'email': user.email
-            }
+            'message': 'Doğrulama e-postası gönderildi. Lütfen e-postanızı kontrol edin.'
         }), 201
 
     except Exception as e:
