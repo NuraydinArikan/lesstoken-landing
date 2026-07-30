@@ -13,6 +13,7 @@ RUN set -eux; \
     if [ -f /src/web/app.py ]; then SRC=/src/web; else SRC=/src; fi; \
     echo "--- using backend sources from: $SRC ---"; \
     cp "$SRC/requirements-backend.txt" "$SRC/app.py" "$SRC/database.py" "$SRC/optimizers.py" /app/; \
+    cp -r "$SRC/migrations" /app/migrations; \
     pip install --no-cache-dir -r /app/requirements-backend.txt; \
     rm -rf /src
 
@@ -24,5 +25,10 @@ ENV FLASK_APP=app.py
 ENV PORT=8080
 EXPOSE 8080
 
-# Shell form so $PORT expands.
-CMD gunicorn -w 4 -b 0.0.0.0:$PORT -t 120 app:app
+# flask db upgrade runs every deploy. The very first deploy after this change
+# applies the single migration from Task 2 directly (production's users table
+# predates any migration tool, so there is no earlier revision to reconcile -
+# Alembic just finds no alembic_version row and runs the one migration that
+# exists). Every deploy after that is a no-op since it's already at head.
+# Shell form so $PORT expands and && chains correctly.
+CMD flask db upgrade && gunicorn -w 4 -b 0.0.0.0:$PORT -t 120 app:app
