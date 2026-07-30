@@ -101,13 +101,19 @@ class UserSettings(db.Model):
 # ============================================================================
 
 def init_db(app):
-    """Initialize database with Flask app"""
-    db.init_app(app)
+    """Initialize database with Flask app.
 
-    with app.app_context():
-        # Create all tables
-        db.create_all()
-        print('✓ Database initialized')
+    Schema creation/migration is Alembic's job (`flask db upgrade`, which the
+    Dockerfile runs before gunicorn starts). Calling db.create_all() here used
+    to race with that: on a brand-new database it would create the users
+    table with the current model's columns (including the email-verification
+    ones) before Alembic ever ran, so the migration that adds those same
+    columns would then collide with them (CircularDependencyError on SQLite,
+    DuplicateColumn on Postgres), crash-looping the container on any fresh
+    database. Alembic's migration history already covers the full schema, so
+    it creates everything correctly on an empty database on its own.
+    """
+    db.init_app(app)
 
 
 def get_db():
