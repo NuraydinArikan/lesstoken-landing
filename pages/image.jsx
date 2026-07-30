@@ -20,6 +20,8 @@ export default function ImageResizePage() {
   const [resized, setResized] = useState(null); // { width, height, bytes }
   const [copyState, setCopyState] = useState('idle'); // idle | copied | failed
   const [jpegBytes, setJpegBytes] = useState(null);
+  const [downloaded, setDownloaded] = useState(false);
+  const [redownloadWarning, setRedownloadWarning] = useState(false);
   const jpegBlobRef = useRef(null);
   const blobRef = useRef(null);
   const previewUrlRef = useRef(null);
@@ -43,6 +45,8 @@ export default function ImageResizePage() {
       setPreviewUrl(null);
       setCopyState('idle');
       setJpegBytes(null);
+      setDownloaded(false);
+      setRedownloadWarning(false);
       blobRef.current = null;
       jpegBlobRef.current = null;
 
@@ -136,6 +140,10 @@ export default function ImageResizePage() {
 
   const downloadJpeg = () => {
     if (!jpegBlobRef.current || !resized) return;
+    // Downloading twice without adding an image gives the same file again;
+    // say so rather than let it look like a fresh result.
+    if (downloaded) setRedownloadWarning(true);
+    setDownloaded(true);
     const url = URL.createObjectURL(jpegBlobRef.current);
     const a = document.createElement('a');
     a.href = url;
@@ -320,8 +328,13 @@ export default function ImageResizePage() {
                   fontWeight: '600',
                 }}
               >
-                {t.downloadJpeg}
+                {downloaded ? t.downloadedJpeg : t.downloadJpeg}
               </button>
+            )}
+            {redownloadWarning && (
+              <p style={{ fontSize: '12px', color: '#92400e', marginTop: '8px' }}>
+                {t.alreadyDownloaded}
+              </p>
             )}
             {copyState === 'failed' && (
               <p style={{ fontSize: '12px', color: '#991b1b', marginTop: '8px' }}>
