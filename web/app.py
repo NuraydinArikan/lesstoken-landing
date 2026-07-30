@@ -47,7 +47,7 @@ OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 # account. Checked in the database rather than in-memory because gunicorn
 # runs 4 worker processes that don't share memory.
 MAX_TEXT_CHARS = 20000
-DAILY_OPTIMIZE_LIMIT = 10
+DAILY_OPTIMIZE_LIMIT = 20
 
 # Outgoing mail for the contact form.
 # SMTP_USER is the login, which is not necessarily an address: Resend, for
