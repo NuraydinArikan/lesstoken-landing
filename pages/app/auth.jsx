@@ -8,6 +8,7 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [needsVerification, setNeedsVerification] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -26,6 +27,7 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setNeedsVerification(false);
 
     try {
       const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
@@ -42,7 +44,17 @@ export default function Auth() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Bir hata oluştu');
+        if (data.code === 'email_not_verified') {
+          setNeedsVerification(true);
+        } else {
+          setError(data.error || 'Bir hata oluştu');
+        }
+        return;
+      }
+
+      if (!isLogin) {
+        // Registration no longer returns a token - it sends a verification email.
+        setNeedsVerification(true);
         return;
       }
 
@@ -106,125 +118,141 @@ export default function Auth() {
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Email */}
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
-                Email Adresi
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="your@email.com"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontFamily: 'inherit'
-                }}
-              />
+          {needsVerification ? (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#166534', marginBottom: '20px' }}>
+                E-postanızı kontrol edin ve doğrulama bağlantısına tıklayın.
+              </p>
+              <button
+                onClick={() => setNeedsVerification(false)}
+                style={{ background: 'none', border: 'none', color: '#0369a1', cursor: 'pointer' }}
+              >
+                Geri dön
+              </button>
             </div>
+          ) : (
+            <>
+              {/* Form */}
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Email */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
+                    Email Adresi
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="your@email.com"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
 
-            {/* Password */}
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
-                Şifre
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder="••••••••"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontFamily: 'inherit'
-                }}
-              />
-            </div>
+                {/* Password */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
+                    Şifre
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="••••••••"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
 
-            {/* Confirm Password (Register only) */}
-            {!isLogin && (
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
-                  Şifre Tekrar
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  placeholder="••••••••"
+                {/* Confirm Password (Register only) */}
+                {!isLogin && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
+                      Şifre Tekrar
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      placeholder="••••••••"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontFamily: 'inherit'
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
                   style={{
-                    width: '100%',
+                    background: 'linear-gradient(135deg, #0369a1 0%, #06b6d4 100%)',
+                    color: 'white',
                     padding: '12px',
-                    border: '1px solid #d1d5db',
+                    border: 'none',
                     borderRadius: '8px',
-                    fontSize: '14px',
-                    fontFamily: 'inherit'
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.7 : 1,
+                    marginTop: '8px'
                   }}
-                />
+                >
+                  {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
+                </button>
+              </form>
+
+              {/* Toggle Login/Register */}
+              <div style={{ marginTop: '24px', textAlign: 'center', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+                <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+                  {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
+                </p>
+                <button
+                  onClick={() => setIsLogin(!isLogin)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#0369a1',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isLogin ? 'Kayıt Olun' : 'Giriş Yapın'}
+                </button>
               </div>
-            )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                background: 'linear-gradient(135deg, #0369a1 0%, #06b6d4 100%)',
-                color: 'white',
-                padding: '12px',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-                marginTop: '8px'
-              }}
-            >
-              {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
-            </button>
-          </form>
-
-          {/* Toggle Login/Register */}
-          <div style={{ marginTop: '24px', textAlign: 'center', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-            <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-              {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
-            </p>
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#0369a1',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              {isLogin ? 'Kayıt Olun' : 'Giriş Yapın'}
-            </button>
-          </div>
-
-          {/* Terms */}
-          <p style={{ fontSize: '12px', color: '#999', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }}>
-            Devam ederek <a href="#" style={{ color: '#0369a1', textDecoration: 'none' }}>Şartları</a> ve
-            <a href="#" style={{ color: '#0369a1', textDecoration: 'none' }}> Gizlilik Politikasını</a> kabul etmiş olursunuz.
-          </p>
+              {/* Terms */}
+              <p style={{ fontSize: '12px', color: '#999', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }}>
+                Devam ederek <a href="#" style={{ color: '#0369a1', textDecoration: 'none' }}>Şartları</a> ve
+                <a href="#" style={{ color: '#0369a1', textDecoration: 'none' }}> Gizlilik Politikasını</a> kabul etmiş olursunuz.
+              </p>
+            </>
+          )}
         </div>
       </div>
     </>
