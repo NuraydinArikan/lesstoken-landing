@@ -469,6 +469,57 @@ def test_reregistering_over_an_expired_unverified_row_succeeds_and_issues_a_new_
         assert not check_password_hash(refreshed.password, "old-password")
 
 
+def test_reregistering_over_a_dead_signup_rolls_back_cleanly_if_the_email_fails_to_send(client, monkeypatch):
+    """The existing rollback test (test_register_rolls_back_the_user_if_the_
+    email_fails_to_send) only covers the fresh-insert path, where rollback
+    just discards a never-committed row. The overwrite path is different in
+    kind: register() mutates the EXISTING victim row in place
+    (user.password = ..., user.verification_token = ...) before attempting
+    to send, so a failed send must roll back those in-place attribute
+    changes too - if it didn't, a victim's dead signup could be silently
+    overwritten with the attacker's password/token merely by the attacker
+    triggering a send failure, with no successful response ever coming back
+    to tip anyone off."""
+
+    def raise_error(*a, **k):
+        raise RuntimeError("Resend is down")
+
+    monkeypatch.setattr(app_module, "send_verification_email", raise_error)
+
+    original_password_hash = generate_password_hash_for_test("victims-original-password")
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="dead-signup-failed-send@example.com",
+            password=original_password_hash,
+            email_verified=False,
+            verification_token="victims-original-token",
+            verification_token_expires=datetime.utcnow() - timedelta(hours=1),  # dead
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"email": "dead-signup-failed-send@example.com", "password": "attacker-password"},
+    )
+
+    assert response.status_code == 502
+
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(
+            email="dead-signup-failed-send@example.com"
+        ).first()
+        # The row still exists at all (nothing deleted)...
+        assert refreshed is not None
+        # ...and every field still matches the victim's original values
+        # (nothing overwritten) - not the attacker's password or a fresh
+        # token issued as part of the failed attempt.
+        assert refreshed.password == original_password_hash
+        assert check_password_hash(refreshed.password, "victims-original-password")
+        assert not check_password_hash(refreshed.password, "attacker-password")
+        assert refreshed.verification_token == "victims-original-token"
+        assert refreshed.verification_token_expires < datetime.utcnow()
+
+
 def test_reregistering_over_a_still_live_unverified_row_still_conflicts(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
     with app_module.app.app_context():

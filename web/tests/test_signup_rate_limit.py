@@ -93,6 +93,42 @@ def test_register_rate_limit_is_per_ip_a_different_ip_is_unaffected(client, monk
     assert allowed.status_code == 201
 
 
+def test_register_rate_limit_buckets_on_the_rightmost_xff_entry_not_the_attacker_supplied_leftmost_one(client, monkeypatch):
+    """With a single trusted proxy hop (x_for=1), ProxyFix resolves the real
+    client to the RIGHTMOST X-Forwarded-For entry - the one appended by our
+    own proxy - and ignores everything to its left, which the client can set
+    to anything. This is the assertion that would actually catch someone
+    changing x_for or switching ProxyFix/manual parsing to read the leftmost
+    entry instead: it must bucket on 9.9.9.9 (rightmost, proxy-written), not
+    1.2.3.4 (leftmost, attacker-supplied)."""
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    # Exhaust the bucket for real client IP 9.9.9.9.
+    for i in range(app_module.SIGNUP_RATE_LIMIT):
+        response = _register(
+            client, f"xff{i}@example.com", headers={"X-Forwarded-For": "9.9.9.9"}
+        )
+        assert response.status_code == 201
+
+    # A request claiming to come via attacker-controlled proxy hop 1.2.3.4,
+    # but whose real (rightmost/proxy-written) address is the already
+    # -exhausted 9.9.9.9, must still be blocked - proving 1.2.3.4 was never
+    # the bucket key.
+    spoofed_leftmost = _register(
+        client,
+        "xff-spoofed@example.com",
+        headers={"X-Forwarded-For": "1.2.3.4, 9.9.9.9"},
+    )
+    assert spoofed_leftmost.status_code == 429
+
+    # 1.2.3.4 as the sole/rightmost (i.e. genuinely real) client address is
+    # an entirely different, unexhausted bucket.
+    genuinely_different_ip = _register(
+        client, "xff-genuine@example.com", headers={"X-Forwarded-For": "1.2.3.4"}
+    )
+    assert genuinely_different_ip.status_code == 201
+
+
 def test_register_malformed_requests_dont_burn_the_rate_limit_budget(client, monkeypatch):
     """The rate-limit check must run after input validation, not before -
     otherwise SIGNUP_RATE_LIMIT malformed submissions (missing email/
