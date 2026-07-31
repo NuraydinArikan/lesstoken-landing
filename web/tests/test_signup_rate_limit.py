@@ -92,6 +92,23 @@ def test_register_rate_limit_is_per_ip_a_different_ip_is_unaffected(client, monk
     assert allowed.status_code == 201
 
 
+def test_register_malformed_requests_dont_burn_the_rate_limit_budget(client, monkeypatch):
+    """The rate-limit check must run after input validation, not before -
+    otherwise SIGNUP_RATE_LIMIT malformed submissions (missing email/
+    password) would lock out a real user for an hour without a single valid
+    attempt ever being made."""
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    for _ in range(app_module.SIGNUP_RATE_LIMIT * 2):
+        response = client.post("/api/v1/auth/register", json={"email": "no-password@example.com"})
+        assert response.status_code == 400
+
+    # None of the malformed requests above counted against the limit - a
+    # real, valid registration from the same IP still succeeds.
+    response = _register(client, "finally-valid@example.com")
+    assert response.status_code == 201
+
+
 def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 

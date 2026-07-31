@@ -217,16 +217,19 @@ def _record_signup_attempt_and_check_limit(endpoint):
 def register():
     """Register a new user and email them a verification link"""
     try:
+        data = request.get_json()
+
+        # Validate input before touching the rate limiter: this check is
+        # free (no DB write), so running it first means five malformed
+        # requests (missing email/password, bad JSON) don't burn any of a
+        # real user's SIGNUP_RATE_LIMIT budget and lock them out for an hour.
+        if not data or not data.get('email') or not data.get('password'):
+            return jsonify({'error': 'Email and password required'}), 400
+
         if _record_signup_attempt_and_check_limit('register'):
             return jsonify({
                 'error': 'Too many signup attempts from this network. Please try again in an hour.'
             }), 429
-
-        data = request.get_json()
-
-        # Validate input
-        if not data or not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email and password required'}), 400
 
         email = data.get('email').lower().strip()
         password = data.get('password')
