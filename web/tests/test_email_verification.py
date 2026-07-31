@@ -19,7 +19,10 @@ os.environ["RESEND_API_KEY"] = "test-resend-key"
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
-from werkzeug.security import generate_password_hash as generate_password_hash_for_test
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash as generate_password_hash_for_test,
+)
 
 import app as app_module
 from database import db, User
@@ -354,3 +357,97 @@ def test_resend_verification_is_rate_limited_to_once_per_60_seconds(client, monk
     assert response.status_code == 200
     assert _GENERIC_RESEND_MESSAGE in response.get_json()["message"]
     assert captured == []  # no email actually sent - rate limited
+
+
+# ============================================================================
+# Registration squatting: re-registering over a dead, never-completed signup
+# ============================================================================
+#
+# Historically, registering victim@example.com created a permanent unverified
+# row. The real owner could then never sign up - register() returned 409
+# "Email already registered" forever, and nothing ever purged the row. The
+# fix: re-registering over an unverified row whose token has already expired
+# (a dead signup) is treated as a fresh signup instead of a conflict. A still
+# -live pending signup, or an already-verified account, still 409s so an
+# attacker can't hijack a real in-flight signup or a verified account.
+
+
+def test_reregistering_over_an_expired_unverified_row_succeeds_and_issues_a_new_token(client, monkeypatch):
+    captured = {}
+    monkeypatch.setattr(
+        app_module,
+        "send_verification_email",
+        lambda to_email, token: captured.update(to_email=to_email, token=token),
+    )
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="squatted@example.com",
+            password=generate_password_hash_for_test("old-password"),
+            email_verified=False,
+            verification_token="dead-token",
+            verification_token_expires=datetime.utcnow() - timedelta(hours=1),
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"email": "squatted@example.com", "password": "new-password"},
+    )
+
+    assert response.status_code == 201
+    assert captured["to_email"] == "squatted@example.com"
+    assert captured["token"] != "dead-token"
+
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="squatted@example.com").first()
+        assert refreshed.email_verified is False
+        assert refreshed.verification_token == captured["token"]
+        assert refreshed.verification_token_expires > datetime.utcnow()
+        # password hash was overwritten to match the new registration
+        assert check_password_hash(refreshed.password, "new-password")
+        assert not check_password_hash(refreshed.password, "old-password")
+
+
+def test_reregistering_over_a_still_live_unverified_row_still_conflicts(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="pending-live@example.com",
+            password=generate_password_hash_for_test("original-password"),
+            email_verified=False,
+            verification_token="live-token",
+            verification_token_expires=datetime.utcnow() + timedelta(hours=1),
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"email": "pending-live@example.com", "password": "attacker-password"},
+    )
+
+    assert response.status_code == 409
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="pending-live@example.com").first()
+        assert refreshed.verification_token == "live-token"
+        assert check_password_hash(refreshed.password, "original-password")
+
+
+def test_reregistering_over_a_verified_account_still_conflicts(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+    with app_module.app.app_context():
+        db.session.add(User(
+            email="already-verified@example.com",
+            password=generate_password_hash_for_test("original-password"),
+            email_verified=True,
+        ))
+        db.session.commit()
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"email": "already-verified@example.com", "password": "attacker-password"},
+    )
+
+    assert response.status_code == 409
+    with app_module.app.app_context():
+        refreshed = db.session.query(User).filter_by(email="already-verified@example.com").first()
+        assert check_password_hash(refreshed.password, "original-password")

@@ -128,30 +128,59 @@ def register():
         # Check if user exists
         db = get_db()
         existing_user = db.query(User).filter_by(email=email).first()
-        if existing_user:
+
+        # A row that is unverified AND whose token has already expired is a
+        # dead, never-completed signup (the real owner never clicked the
+        # link, and nothing ever purges the row). Treat re-registering over
+        # it as a fresh signup rather than a permanent conflict - otherwise
+        # squatting on someone else's email locks them out forever. Still
+        # 409 when the row is verified, or unverified but its token is still
+        # live, so an attacker can't hijack a real in-flight signup or a
+        # verified account by re-registering during the 24h window.
+        is_dead_signup = (
+            existing_user is not None
+            and not existing_user.email_verified
+            and (
+                existing_user.verification_token_expires is None
+                or existing_user.verification_token_expires < datetime.utcnow()
+            )
+        )
+
+        if existing_user and not is_dead_signup:
             return jsonify({'error': 'Email already registered'}), 409
 
-        # Create new, unverified user
         token = secrets.token_urlsafe(32)
-        user = User(
-            email=email,
-            password=generate_password_hash(password),
-            email_verified=False,
-            verification_token=token,
-            verification_token_expires=datetime.utcnow() + timedelta(hours=24)
-        )
-        db.add(user)
-        db.commit()
 
+        if is_dead_signup:
+            user = existing_user
+            user.password = generate_password_hash(password)
+            user.verification_token = token
+            user.verification_token_expires = datetime.utcnow() + timedelta(hours=24)
+        else:
+            # Create new, unverified user
+            user = User(
+                email=email,
+                password=generate_password_hash(password),
+                email_verified=False,
+                verification_token=token,
+                verification_token_expires=datetime.utcnow() + timedelta(hours=24)
+            )
+            db.add(user)
+
+        # Don't commit until the email actually sends: on failure, a plain
+        # rollback() cleanly discards the uncommitted insert (new signup) or
+        # the uncommitted overwrite (dead-signup re-registration) alike,
+        # leaving no half-registered/half-overwritten row behind either way.
         try:
             send_verification_email(email, token)
         except Exception:
             logger.exception('Verification email delivery failed')
-            db.delete(user)
-            db.commit()
+            db.rollback()
             return jsonify({
                 'error': 'Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin.'
             }), 502
+
+        db.commit()
 
         return jsonify({
             'message': 'Doğrulama e-postası gönderildi. Lütfen e-postanızı kontrol edin.'
