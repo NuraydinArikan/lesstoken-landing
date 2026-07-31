@@ -37,7 +37,26 @@ app = Flask(__name__)
 # X-Forwarded-For or trusting its leftmost entry - a client can put
 # anything there; only the entry added by our own trusted proxy is safe to
 # read, which is what x_for=1 does.
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
+#
+# The hop count is configurable (TRUSTED_PROXY_HOPS, default 1 for Railway's
+# current single-hop setup) because both failure modes here are silent:
+# reached directly with a hop count that's too high, the limiter fails OPEN
+# (a caller sets its own X-Forwarded-For and gets a fresh bucket every
+# request); put another proxy/CDN in front of Railway without bumping this,
+# and it fails CLOSED for the whole site (everyone buckets on the CDN edge
+# IP - 5 signups/hour, total, with a legitimate-looking 429 and nothing in
+# the logs to explain it). Every other parameter is spelled out explicitly
+# too, rather than left to ProxyFix's defaults, so x_proto=1 (trusting
+# X-Forwarded-Proto from that same single hop) is a deliberate, visible
+# choice rather than an inherited default.
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=int(os.getenv('TRUSTED_PROXY_HOPS', '1')),
+    x_proto=1,
+    x_host=0,
+    x_port=0,
+    x_prefix=0,
+)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
