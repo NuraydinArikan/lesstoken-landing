@@ -141,23 +141,35 @@ def _hash_ip(ip):
 
 
 def _record_signup_attempt_and_check_limit(endpoint):
-    """Record this request against `endpoint`'s per-IP counter and report
-    whether that IP has now made SIGNUP_RATE_LIMIT or more requests to it in
-    the last hour (including this one).
+    """Report whether this IP has already made SIGNUP_RATE_LIMIT or more
+    requests to `endpoint` in the last hour, and if not, record this request
+    against its counter.
 
     Only a salted hash of request.remote_addr is stored (see _hash_ip) - by
     the time this runs, ProxyFix has already resolved remote_addr to the
-    real client address rather than Railway's proxy. Rows older than 24h are
-    pruned opportunistically on every call so the table stays small and the
-    data genuinely expires.
+    real client address rather than Railway's proxy.
+
+    The count check runs before the write, and a request that is about to be
+    rejected returns immediately WITHOUT writing a row or committing - an
+    attacker hammering this endpoint would otherwise force a DELETE + COUNT +
+    INSERT + COMMIT on every single rejected request, turning the limiter
+    into the DB-load amplifier it exists to prevent. This doesn't change the
+    limiter's semantics: an IP still unblocks an hour after its 5th accepted
+    attempt, since only accepted attempts are ever recorded.
     """
     session = get_db()
     now = datetime.utcnow()
     ip_hash = _hash_ip(request.remote_addr or '')
 
-    session.query(SignupAttempt).filter(
-        SignupAttempt.created_at < now - SIGNUP_ATTEMPT_RETENTION
-    ).delete()
+    # Pruning rows older than 24h doesn't need to happen on every call - it
+    # only needs to happen often enough that the table doesn't grow forever.
+    # Making it probabilistic (roughly 1 in 100 calls) means a burst of
+    # requests - accepted or rejected - costs at most one COUNT plus,
+    # usually, one INSERT, instead of a DELETE scan on every single request.
+    if secrets.randbelow(100) == 0:
+        session.query(SignupAttempt).filter(
+            SignupAttempt.created_at < now - SIGNUP_ATTEMPT_RETENTION
+        ).delete()
 
     window_start = now - SIGNUP_RATE_LIMIT_WINDOW
     recent_count = session.query(SignupAttempt).filter(
@@ -166,10 +178,14 @@ def _record_signup_attempt_and_check_limit(endpoint):
         SignupAttempt.created_at >= window_start,
     ).count()
 
+    if recent_count >= SIGNUP_RATE_LIMIT:
+        session.commit()  # commit the probabilistic prune, if it ran above
+        return True
+
     session.add(SignupAttempt(ip_hash=ip_hash, endpoint=endpoint, created_at=now))
     session.commit()
 
-    return recent_count >= SIGNUP_RATE_LIMIT
+    return False
 
 
 @app.route('/api/v1/auth/register', methods=['POST'])
