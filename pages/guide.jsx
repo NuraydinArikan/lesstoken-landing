@@ -108,13 +108,13 @@ export default function Guide() {
         {
           number: 2,
           title: 'Hesap Oluşturun',
-          description: 'Email adresiniz ve güvenli bir şifre ile yeni hesap oluşturun. Hesaplar tamamen ücretsizdir.',
+          description: 'E-posta adresiniz ve güvenli bir şifre ile yeni hesap oluşturun. Hesaplar tamamen ücretsizdir.',
           image: '👤'
         },
         {
           number: 3,
           title: 'Giriş Yapın',
-          description: 'Email ve şifreniz ile sisteme giriş yapın.',
+          description: 'E-posta ve şifreniz ile sisteme giriş yapın.',
           image: '🔐'
         },
         {

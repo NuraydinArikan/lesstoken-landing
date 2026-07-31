@@ -176,15 +176,16 @@ export default function Auth() {
                 {/* Email */}
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#374151' }}>
-                    Email Adresi
+                    E-posta Adresi
                   </label>
                   <input
                     type="email"
                     name="email"
+                    autoComplete="username"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    placeholder="your@email.com"
+                    placeholder="ornek@eposta.com"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -204,6 +205,9 @@ export default function Auth() {
                   <input
                     type="password"
                     name="password"
+                    /* new-password on signup is what makes the browser/password
+                       manager offer to generate and save a strong one. */
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -228,6 +232,7 @@ export default function Auth() {
                     <input
                       type="password"
                       name="confirmPassword"
+                      autoComplete="new-password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required

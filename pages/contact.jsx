@@ -63,7 +63,7 @@ export default function Contact() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '60px' }}>
             {/* Email */}
             <div>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>Email</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>E-posta</h3>
               <a href="mailto:info@lesstoken.app" style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '16px' }}>
                 info@lesstoken.app
               </a>
@@ -121,7 +121,7 @@ export default function Contact() {
 
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
-                  Email Adresiniz
+                  E-posta Adresiniz
                 </label>
                 <input
                   type="email"
