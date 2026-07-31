@@ -206,7 +206,9 @@ def test_verify_accepts_a_valid_token(client):
     response = client.get("/api/v1/auth/verify?token=valid-token")
 
     assert response.status_code == 200
-    assert "token" in response.get_json()
+    # No session is issued from a verification link - the user logs in
+    # normally afterwards. See the comment in verify() for why.
+    assert "token" not in response.get_json()
 
     with app_module.app.app_context():
         refreshed = db.session.query(User).filter_by(email="pending@example.com").first()
@@ -222,7 +224,7 @@ def test_verify_is_idempotent_for_a_repeat_request_with_the_same_token(client):
     """Email security scanners (Outlook Safe Links, Proofpoint, etc.) GET
     verification links automatically before the human clicks them. A second
     GET with the same valid token - whether from a scanner-then-human or a
-    double-click - must succeed again (fresh JWT), not 400."""
+    double-click - must succeed again, not 400."""
     with app_module.app.app_context():
         user = User(
             email="scanned@example.com",
@@ -236,11 +238,11 @@ def test_verify_is_idempotent_for_a_repeat_request_with_the_same_token(client):
 
     first = client.get("/api/v1/auth/verify?token=scanner-token")
     assert first.status_code == 200
-    assert "token" in first.get_json()
+    assert "token" not in first.get_json()
 
     second = client.get("/api/v1/auth/verify?token=scanner-token")
     assert second.status_code == 200
-    assert "token" in second.get_json()
+    assert "token" not in second.get_json()
 
     with app_module.app.app_context():
         refreshed = db.session.query(User).filter_by(email="scanned@example.com").first()

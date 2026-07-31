@@ -27,10 +27,10 @@ export default function Verify() {
           setErrorMessage(data.error || 'Doğrulama başarısız oldu.');
           return;
         }
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        // No session is stored here: the endpoint deliberately issues no
+        // token, because this link arrives by email and gets pre-fetched by
+        // security scanners. The user logs in normally from here.
         setStatus('success');
-        setTimeout(() => router.push('/app/dashboard'), 1500);
       })
       .catch(() => {
         setStatus('error');
@@ -74,9 +74,23 @@ export default function Verify() {
 
           {status === 'success' && (
             <>
-              <p style={{ color: '#166534', fontWeight: 600 }}>
-                E-postanız doğrulandı. Yönlendiriliyorsunuz...
+              <p style={{ color: '#166534', fontWeight: 600, marginBottom: '20px' }}>
+                E-postanız doğrulandı. Artık giriş yapabilirsiniz.
               </p>
+              <a
+                href="/app/auth"
+                style={{
+                  display: 'block',
+                  background: 'linear-gradient(135deg, #0369a1 0%, #06b6d4 100%)',
+                  color: 'white',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  textDecoration: 'none'
+                }}
+              >
+                Giriş Yap
+              </a>
             </>
           )}
 

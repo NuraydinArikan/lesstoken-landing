@@ -233,22 +233,13 @@ def verify():
         user.email_verified = True
         db.commit()
 
-    token = jwt.encode(
-        {
-            'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(days=30)
-        },
-        app.config['SECRET_KEY'],
-        algorithm='HS256'
-    )
-
+    # Deliberately issues no session here. This link travels through email and
+    # is pre-fetched by security scanners (see the comment above), so anything
+    # it hands back is effectively public - a JWT included. Confirming an
+    # address is idempotent and harmless to repeat; handing out a 30-day
+    # session is not. The user logs in normally afterwards.
     return jsonify({
-        'message': 'E-posta doğrulandı',
-        'token': token,
-        'user': {
-            'id': user.id,
-            'email': user.email
-        }
+        'message': 'E-posta doğrulandı'
     }), 200
 
 
