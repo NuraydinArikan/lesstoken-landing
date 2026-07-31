@@ -64,6 +64,11 @@ def test_send_verification_email_posts_to_resend_with_the_link(monkeypatch):
     assert captured["headers"]["Authorization"] == "Bearer test-resend-key"
     assert captured["json"]["to"] == ["someone@example.com"]
     assert "abc123token" in captured["json"]["text"]
+    # Softens the pre-hijacking window created by re-registration over a dead
+    # signup row (see register()'s is_dead_signup comment): if this wasn't
+    # the recipient's own request, the body must say so and make clear
+    # ignoring it is safe, rather than being a bare, frictionless link.
+    assert "yok sayabilirsiniz" in captured["json"]["text"]
     # Short timeout so a slow Resend can't hold a sync gunicorn worker (and,
     # with 4 workers, the whole API) hostage for long. See the comment next
     # to the timeout= arg in send_verification_email for the full reasoning.

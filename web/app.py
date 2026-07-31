@@ -756,11 +756,21 @@ def send_verification_email(to_email, token):
     if not RESEND_API_KEY:
         raise RuntimeError('RESEND_API_KEY is not configured')
 
+    # Re-registering over a dead (unverified + expired-token) signup row lets
+    # someone else request a new verification email for this address (see the
+    # comment on is_dead_signup in register()) - narrow, and guarded by the
+    # two 409 checks there, but if it's not this recipient who requested it,
+    # a bare link is frictionless to click. Naming the event and giving an
+    # explicit "ignore it if this wasn't you" out gives the real owner a
+    # reason to pause instead of just clicking through.
     link = f'https://lesstoken.app/app/verify?token={token}'
     body = (
-        'LessToken hesabınızı doğrulamak için:\n'
+        'Bu e-posta adresi için LessToken hesabı oluşturma talebinde bulunuldu.\n'
+        'Doğrulamak için:\n'
         f'{link}\n\n'
-        'Bu bağlantı 24 saat geçerlidir.\n'
+        'Bu bağlantının süresi 24 saat sonra dolar.\n\n'
+        'Bu talebi siz oluşturmadıysanız bu e-postayı yok sayabilirsiniz; '
+        'hesap etkinleştirilmeyecektir.\n'
     )
 
     response = requests.post(
