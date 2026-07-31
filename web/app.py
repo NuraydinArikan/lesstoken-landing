@@ -6,6 +6,7 @@ REST API for AI text optimization with user authentication
 import os
 import json
 import logging
+import hashlib
 import secrets
 from datetime import datetime, timedelta
 from functools import wraps
@@ -15,15 +16,27 @@ import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 # Local imports (will create these)
-from database import init_db, get_db, db, User, OptimizationHistory
+from database import init_db, get_db, db, User, OptimizationHistory, SignupAttempt
 from optimizers import optimize_text_with_provider
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Railway runs a reverse proxy in front of this app, so without this,
+# request.remote_addr is always the proxy's own address - every user on
+# earth would share one IP-based rate-limit bucket, and the first few
+# signups would lock out everyone. x_for=1 trusts exactly one proxy hop
+# (Railway's) and resolves remote_addr to the real client address from the
+# last X-Forwarded-For entry. Deliberately NOT hand-parsing
+# X-Forwarded-For or trusting its leftmost entry - a client can put
+# anything there; only the entry added by our own trusted proxy is safe to
+# read, which is what x_for=1 does.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
@@ -49,6 +62,15 @@ OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 # runs 4 worker processes that don't share memory.
 MAX_TEXT_CHARS = 20000
 DAILY_OPTIMIZE_LIMIT = 20
+
+# register and resend-verification are both public, unauthenticated, and
+# trigger a real outbound email (and, for register, a DB row) per request -
+# with no limit at all either one is a free spam/cost vector. Limited to 5
+# requests per IP per hour, counted from the database for the same reason
+# as DAILY_OPTIMIZE_LIMIT above (4 gunicorn workers, no shared memory).
+SIGNUP_RATE_LIMIT = 5
+SIGNUP_RATE_LIMIT_WINDOW = timedelta(hours=1)
+SIGNUP_ATTEMPT_RETENTION = timedelta(hours=24)
 
 # Outgoing mail for the contact form, via Resend's HTTP API rather than raw
 # SMTP: Railway's outbound network blocks SMTP ports (25/465/587), so a
@@ -112,10 +134,53 @@ def token_required(f):
 # Authentication Routes
 # ============================================================================
 
+def _hash_ip(ip):
+    """Salt the client IP with SECRET_KEY before storing it, so the stored
+    value is useless for recovering the real IP without the server secret."""
+    return hashlib.sha256((app.config['SECRET_KEY'] + ip).encode()).hexdigest()
+
+
+def _record_signup_attempt_and_check_limit(endpoint):
+    """Record this request against `endpoint`'s per-IP counter and report
+    whether that IP has now made SIGNUP_RATE_LIMIT or more requests to it in
+    the last hour (including this one).
+
+    Only a salted hash of request.remote_addr is stored (see _hash_ip) - by
+    the time this runs, ProxyFix has already resolved remote_addr to the
+    real client address rather than Railway's proxy. Rows older than 24h are
+    pruned opportunistically on every call so the table stays small and the
+    data genuinely expires.
+    """
+    session = get_db()
+    now = datetime.utcnow()
+    ip_hash = _hash_ip(request.remote_addr or '')
+
+    session.query(SignupAttempt).filter(
+        SignupAttempt.created_at < now - SIGNUP_ATTEMPT_RETENTION
+    ).delete()
+
+    window_start = now - SIGNUP_RATE_LIMIT_WINDOW
+    recent_count = session.query(SignupAttempt).filter(
+        SignupAttempt.ip_hash == ip_hash,
+        SignupAttempt.endpoint == endpoint,
+        SignupAttempt.created_at >= window_start,
+    ).count()
+
+    session.add(SignupAttempt(ip_hash=ip_hash, endpoint=endpoint, created_at=now))
+    session.commit()
+
+    return recent_count >= SIGNUP_RATE_LIMIT
+
+
 @app.route('/api/v1/auth/register', methods=['POST'])
 def register():
     """Register a new user and email them a verification link"""
     try:
+        if _record_signup_attempt_and_check_limit('register'):
+            return jsonify({
+                'error': 'Too many signup attempts from this network. Please try again in an hour.'
+            }), 429
+
         data = request.get_json()
 
         # Validate input
@@ -282,6 +347,13 @@ def resend_verification():
     generic_response = jsonify({
         'message': 'Eğer bu e-posta kayıtlıysa, doğrulama bağlantısı gönderildi'
     }), 200
+
+    # Rate-limited requests get the exact same generic_response as every
+    # other branch below (unknown email, verified account, cooldown) - this
+    # endpoint must never reveal, via a different status code or message,
+    # whether an email is registered, verified, or just being rate-limited.
+    if _record_signup_attempt_and_check_limit('resend-verification'):
+        return generic_response
 
     data = request.get_json(silent=True)
     if not data or not data.get('email'):

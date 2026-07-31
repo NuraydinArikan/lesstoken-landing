@@ -1,0 +1,146 @@
+"""
+Tests for per-IP rate limiting on /api/v1/auth/register and
+/api/v1/auth/resend-verification.
+
+Both endpoints are public and unauthenticated: register() creates a DB row
+and sends a real email via the Resend HTTP API, and resend-verification
+re-sends one. With no limit at all, a single client could hammer either one
+indefinitely - spamming Resend, filling the users table, or (for
+resend-verification) using it as a mail-bombing vector against a victim's
+inbox. Both are limited to 5 requests per IP per hour, counted from the
+database (production runs 4 gunicorn worker processes that don't share
+memory - the same reason DAILY_OPTIMIZE_LIMIT in app.py is DB-backed).
+
+The IP itself is never stored - only a salted (SECRET_KEY-mixed) SHA-256
+hash of it, pruned after 24h - so these tests also confirm the rate limit
+is grouped by the real client IP as seen through Railway's proxy (via
+ProxyFix), not by the proxy's own address.
+"""
+import os
+import sys
+from datetime import datetime, timedelta
+
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["SECRET_KEY"] = "test-secret"
+os.environ["RESEND_API_KEY"] = "test-resend-key"
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import pytest
+from werkzeug.security import generate_password_hash as generate_password_hash_for_test
+
+import app as app_module
+from database import db, User, SignupAttempt
+
+
+@pytest.fixture()
+def client():
+    app_module.app.config["TESTING"] = True
+    with app_module.app.app_context():
+        db.drop_all()
+        db.create_all()
+    with app_module.app.test_client() as c:
+        yield c
+    with app_module.app.app_context():
+        db.drop_all()
+
+
+def _register(client, email, headers=None):
+    return client.post(
+        "/api/v1/auth/register",
+        json={"email": email, "password": "hunter22"},
+        headers=headers or {},
+    )
+
+
+def test_register_blocks_the_6th_request_from_the_same_ip_within_an_hour(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    for i in range(5):
+        response = _register(client, f"limit{i}@example.com")
+        assert response.status_code == 201
+
+    sixth = _register(client, "limit5@example.com")
+    assert sixth.status_code == 429
+
+
+def test_register_rate_limit_is_per_ip_a_different_ip_is_unaffected(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    for i in range(5):
+        response = _register(client, f"perip{i}@example.com")
+        assert response.status_code == 201
+
+    # Same (default) client IP is now blocked.
+    blocked = _register(client, "perip-blocked@example.com")
+    assert blocked.status_code == 429
+
+    # A different client IP, arriving through the same single trusted proxy
+    # hop, is unaffected.
+    allowed = _register(
+        client, "perip-allowed@example.com", headers={"X-Forwarded-For": "9.9.9.9"}
+    )
+    assert allowed.status_code == 201
+
+
+def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    with app_module.app.app_context():
+        ip_hash = app_module._hash_ip("127.0.0.1")
+        for i in range(5):
+            db.session.add(SignupAttempt(
+                ip_hash=ip_hash,
+                endpoint="register",
+                created_at=datetime.utcnow() - timedelta(hours=2),
+            ))
+        db.session.commit()
+
+    response = _register(client, "afterold@example.com")
+    assert response.status_code == 201
+
+
+def test_resend_verification_rate_limit_response_is_identical_to_the_unknown_email_response(client, monkeypatch):
+    sent_to = []
+    monkeypatch.setattr(
+        app_module,
+        "send_verification_email",
+        lambda to_email, token: sent_to.append(to_email),
+    )
+
+    with app_module.app.app_context():
+        for i in range(6):
+            db.session.add(User(
+                email=f"ratelimit-resend-{i}@example.com",
+                password=generate_password_hash_for_test("hunter22"),
+                email_verified=False,
+                verification_token=f"old-token-{i}",
+                # Well past both the 24h token expiry and the 60s resend
+                # cooldown, so an un-rate-limited resend for any one of
+                # these would succeed and actually send.
+                verification_token_expires=datetime.utcnow() - timedelta(hours=48),
+            ))
+        db.session.commit()
+
+    responses = [
+        client.post(
+            "/api/v1/auth/resend-verification",
+            json={"email": f"ratelimit-resend-{i}@example.com"},
+        )
+        for i in range(6)
+    ]
+
+    # Only the first 5 requests actually triggered a send.
+    assert len(sent_to) == 5
+
+    sixth = responses[5]
+    unknown_email_response = client.post(
+        "/api/v1/auth/resend-verification", json={"email": "totally-unknown@example.com"}
+    )
+
+    assert sixth.status_code == 200
+    assert unknown_email_response.status_code == 200
+    assert sixth.get_data() == unknown_email_response.get_data()
+    # The 6th request was intercepted by the rate limiter, not the normal
+    # "account is resendable" path - no 6th email was sent.
+    assert len(sent_to) == 5

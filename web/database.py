@@ -73,6 +73,29 @@ class OptimizationHistory(db.Model):
         return f'<Optimization {self.id} by User {self.user_id}>'
 
 
+class SignupAttempt(db.Model):
+    """Per-IP rate-limit counter for public, unauthenticated signup-adjacent
+    endpoints (register, resend-verification).
+
+    Only a salted hash of the client's IP is ever stored - never the raw
+    address - and rows are pruned once they're more than 24h old, so the
+    IP is genuinely unrecoverable and the table stays small. `endpoint` keeps
+    register and resend-verification counted separately. Counted from the
+    database rather than an in-memory counter, same reasoning as
+    OptimizationHistory / DAILY_OPTIMIZE_LIMIT: gunicorn runs 4 worker
+    processes that don't share memory.
+    """
+    __tablename__ = 'signup_attempts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ip_hash = db.Column(db.String(64), nullable=False, index=True)
+    endpoint = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    def __repr__(self):
+        return f'<SignupAttempt {self.endpoint} {self.ip_hash[:8]}...>'
+
+
 class UserSettings(db.Model):
     """User preferences and settings"""
     __tablename__ = 'user_settings'
