@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('ip_hash', sa.String(length=64), nullable=False),
     sa.Column('endpoint', sa.String(length=50), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('signup_attempts', schema=None) as batch_op:

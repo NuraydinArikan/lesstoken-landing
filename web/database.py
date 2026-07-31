@@ -90,7 +90,12 @@ class SignupAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip_hash = db.Column(db.String(64), nullable=False, index=True)
     endpoint = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    # NOT NULL matters here specifically: a NULL created_at is neither
+    # counted (`>= window_start` is NULL, not true) nor pruned (`< cutoff` is
+    # NULL, not true) by the queries in app.py - it would leak permanently,
+    # uncounted and unremovable, defeating both the rate limit and the
+    # retention window.
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
 
     def __repr__(self):
         return f'<SignupAttempt {self.endpoint} {self.ip_hash[:8]}...>'
