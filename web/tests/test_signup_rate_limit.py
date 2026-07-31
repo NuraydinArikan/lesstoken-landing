@@ -71,6 +71,7 @@ def test_register_blocks_the_request_after_the_limit_from_the_same_ip_within_an_
 
     over_limit = _register(client, "limit-over@example.com")
     assert over_limit.status_code == 429
+    assert over_limit.headers.get("Retry-After") == str(app_module.SIGNUP_RATE_LIMIT_RETRY_AFTER)
 
 
 def test_register_rate_limit_is_per_ip_a_different_ip_is_unaffected(client, monkeypatch):
@@ -109,6 +110,28 @@ def test_register_malformed_requests_dont_burn_the_rate_limit_budget(client, mon
     assert response.status_code == 201
 
 
+def test_hash_ip_uses_hmac_not_naive_key_prepending(client):
+    """_hash_ip must be a proper keyed HMAC digest, not sha256(key + ip) -
+    the two happen to produce different digests for the same inputs, which
+    is enough to confirm the construction actually changed."""
+    import hashlib
+    import hmac as hmac_module
+
+    with app_module.app.app_context():
+        ip = "203.0.113.7"
+        actual = app_module._hash_ip(ip)
+
+        naive_sha256 = hashlib.sha256(
+            (app_module.app.config["SECRET_KEY"] + ip).encode()
+        ).hexdigest()
+        proper_hmac = hmac_module.new(
+            app_module.app.config["SECRET_KEY"].encode(), ip.encode(), hashlib.sha256
+        ).hexdigest()
+
+        assert actual == proper_hmac
+        assert actual != naive_sha256
+
+
 def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 
@@ -139,6 +162,7 @@ def test_contact_blocks_the_request_after_the_limit_from_the_same_ip_within_an_h
 
     over_limit = _contact(client)
     assert over_limit.status_code == 429
+    assert over_limit.headers.get("Retry-After") == str(app_module.SIGNUP_RATE_LIMIT_RETRY_AFTER)
 
 
 def test_contact_rate_limit_bucket_is_independent_of_register(client, monkeypatch):
@@ -200,6 +224,11 @@ def test_resend_verification_rate_limit_response_is_identical_to_the_unknown_ema
     assert over_limit.status_code == 200
     assert unknown_email_response.status_code == 200
     assert over_limit.get_data() == unknown_email_response.get_data()
+    # No Retry-After (or any other distinguishing header) either - unlike
+    # register()/contact(), resend-verification's rate-limited branch must
+    # return the exact same generic_response as every other branch, or the
+    # header itself would leak whether the rate limiter fired.
+    assert "Retry-After" not in over_limit.headers
     # The over-limit request was intercepted by the rate limiter, not the
     # normal "account is resendable" path - no extra email was sent.
     assert len(sent_to) == app_module.SIGNUP_RATE_LIMIT

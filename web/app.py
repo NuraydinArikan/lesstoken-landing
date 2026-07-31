@@ -7,6 +7,7 @@ import os
 import json
 import logging
 import hashlib
+import hmac
 import secrets
 from datetime import datetime, timedelta
 from functools import wraps
@@ -97,6 +98,13 @@ SIGNUP_RATE_LIMIT = 15
 SIGNUP_RATE_LIMIT_WINDOW = timedelta(hours=1)
 SIGNUP_ATTEMPT_RETENTION = timedelta(hours=24)
 
+# Retry-After on the signup-rate-limit 429s. Deliberately the fixed window
+# length rather than a precisely-computed "seconds until your oldest
+# attempt ages out" value - that would need another query per rejected
+# request, which is exactly the kind of per-rejection DB cost
+# _record_signup_attempt_and_check_limit was just fixed to avoid.
+SIGNUP_RATE_LIMIT_RETRY_AFTER = int(SIGNUP_RATE_LIMIT_WINDOW.total_seconds())
+
 # Outgoing mail for the contact form, via Resend's HTTP API rather than raw
 # SMTP: Railway's outbound network blocks SMTP ports (25/465/587), so a
 # socket-level smtplib connection to smtp.resend.com times out every time.
@@ -160,9 +168,18 @@ def token_required(f):
 # ============================================================================
 
 def _hash_ip(ip):
-    """Salt the client IP with SECRET_KEY before storing it, so the stored
-    value is useless for recovering the real IP without the server secret."""
-    return hashlib.sha256((app.config['SECRET_KEY'] + ip).encode()).hexdigest()
+    """Keyed-hash the client IP with SECRET_KEY before storing it, so the
+    stored value is useless for recovering the real IP without the server
+    secret. Uses HMAC rather than sha256(key + message) - HMAC is the
+    standards-correct construction for a keyed digest (it's specifically
+    designed to resist the length-extension and related-key issues that
+    naive key-prepending doesn't guard against), even though the practical
+    exposure here is low since nothing else is derived from this hash."""
+    return hmac.new(
+        app.config['SECRET_KEY'].encode(),
+        ip.encode(),
+        hashlib.sha256,
+    ).hexdigest()
 
 
 def _record_signup_attempt_and_check_limit(endpoint):
@@ -227,9 +244,11 @@ def register():
             return jsonify({'error': 'Email and password required'}), 400
 
         if _record_signup_attempt_and_check_limit('register'):
-            return jsonify({
+            response = jsonify({
                 'error': 'Too many signup attempts from this network. Please try again in an hour.'
-            }), 429
+            })
+            response.headers['Retry-After'] = str(SIGNUP_RATE_LIMIT_RETRY_AFTER)
+            return response, 429
 
         email = data.get('email').lower().strip()
         password = data.get('password')
@@ -813,9 +832,11 @@ def contact():
     # everyone. Shares the same per-IP counter/limit, keyed under its own
     # endpoint name so it doesn't share a bucket with register/resend.
     if _record_signup_attempt_and_check_limit('contact'):
-        return jsonify({
+        response = jsonify({
             'error': 'Too many requests from this network. Please try again in an hour.'
-        }), 429
+        })
+        response.headers['Retry-After'] = str(SIGNUP_RATE_LIMIT_RETRY_AFTER)
+        return response, 429
 
     data = request.get_json(silent=True)
 
