@@ -768,6 +768,18 @@ def send_verification_email(to_email, token):
 @app.route('/api/v1/contact', methods=['POST'])
 def contact():
     """Handle contact form submissions"""
+    # Public, unauthenticated, and sends a real Resend email per request with
+    # no other limit - exactly the same cost/spam vector as register() and
+    # resend-verification, and without this an attacker blocked on those
+    # endpoints would simply move here and burn the Resend quota, at which
+    # point verification emails start failing and registration 502s for
+    # everyone. Shares the same per-IP counter/limit, keyed under its own
+    # endpoint name so it doesn't share a bucket with register/resend.
+    if _record_signup_attempt_and_check_limit('contact'):
+        return jsonify({
+            'error': 'Too many requests from this network. Please try again in an hour.'
+        }), 429
+
     data = request.get_json(silent=True)
 
     # Validate input
@@ -781,7 +793,7 @@ def contact():
 
     try:
         send_contact_email(name, email, subject, message)
-    except Exception as e:
+    except Exception:
         logger.exception('Contact form delivery failed')
         return jsonify({
             'error': 'Mesaj gönderilemedi. Lütfen doğrudan '

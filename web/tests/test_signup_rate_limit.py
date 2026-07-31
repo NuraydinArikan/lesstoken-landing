@@ -53,6 +53,14 @@ def _register(client, email, headers=None):
     )
 
 
+def _contact(client, headers=None):
+    return client.post(
+        "/api/v1/contact",
+        json={"email": "someone@example.com", "message": "hello"},
+        headers=headers or {},
+    )
+
+
 def test_register_blocks_the_6th_request_from_the_same_ip_within_an_hour(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 
@@ -97,6 +105,37 @@ def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
         db.session.commit()
 
     response = _register(client, "afterold@example.com")
+    assert response.status_code == 201
+
+
+def test_contact_blocks_the_6th_request_from_the_same_ip_within_an_hour(client, monkeypatch):
+    """/api/v1/contact is public, unauthenticated, and sends a real Resend
+    email per request with no other limit - an attacker blocked at /register
+    would otherwise simply move here and burn the Resend quota. It shares the
+    same per-IP rate limiter helper as register/resend-verification."""
+    monkeypatch.setattr(app_module, "send_contact_email", lambda *a, **k: None)
+
+    for _ in range(5):
+        response = _contact(client)
+        assert response.status_code == 200
+
+    sixth = _contact(client)
+    assert sixth.status_code == 429
+
+
+def test_contact_rate_limit_bucket_is_independent_of_register(client, monkeypatch):
+    """contact() is recorded under its own 'contact' endpoint name, so
+    hammering it must not affect - and must not be affected by - the
+    register() bucket for the same IP."""
+    monkeypatch.setattr(app_module, "send_contact_email", lambda *a, **k: None)
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    for _ in range(5):
+        assert _contact(client).status_code == 200
+    assert _contact(client).status_code == 429
+
+    # register() is untouched - it has its own counter.
+    response = _register(client, "separate-bucket@example.com")
     assert response.status_code == 201
 
 
