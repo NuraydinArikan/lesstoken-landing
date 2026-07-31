@@ -83,12 +83,17 @@ OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 MAX_TEXT_CHARS = 20000
 DAILY_OPTIMIZE_LIMIT = 20
 
-# register and resend-verification are both public, unauthenticated, and
-# trigger a real outbound email (and, for register, a DB row) per request -
-# with no limit at all either one is a free spam/cost vector. Limited to 5
-# requests per IP per hour, counted from the database for the same reason
-# as DAILY_OPTIMIZE_LIMIT above (4 gunicorn workers, no shared memory).
-SIGNUP_RATE_LIMIT = 5
+# register, resend-verification, and contact are all public, unauthenticated,
+# and trigger a real outbound email (and, for register, a DB row) per request
+# - with no limit at all any one of them is a free spam/cost vector. Limited
+# to 15 requests per IP per hour, counted from the database for the same
+# reason as DAILY_OPTIMIZE_LIMIT above (4 gunicorn workers, no shared
+# memory). Deliberately not tighter than this: a single IP can front an
+# entire mobile carrier's CGNAT pool or a corporate/university's egress
+# address, covering thousands of real users, and the real defence against
+# mail-bombing a single victim is the separate per-email resend cooldown
+# (RESEND_COOLDOWN_SECONDS), not this per-IP cap.
+SIGNUP_RATE_LIMIT = 15
 SIGNUP_RATE_LIMIT_WINDOW = timedelta(hours=1)
 SIGNUP_ATTEMPT_RETENTION = timedelta(hours=24)
 

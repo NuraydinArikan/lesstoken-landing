@@ -7,9 +7,10 @@ and sends a real email via the Resend HTTP API, and resend-verification
 re-sends one. With no limit at all, a single client could hammer either one
 indefinitely - spamming Resend, filling the users table, or (for
 resend-verification) using it as a mail-bombing vector against a victim's
-inbox. Both are limited to 5 requests per IP per hour, counted from the
-database (production runs 4 gunicorn worker processes that don't share
-memory - the same reason DAILY_OPTIMIZE_LIMIT in app.py is DB-backed).
+inbox. Both are limited to SIGNUP_RATE_LIMIT requests per IP per hour,
+counted from the database (production runs 4 gunicorn worker processes that
+don't share memory - the same reason DAILY_OPTIMIZE_LIMIT in app.py is
+DB-backed).
 
 The IP itself is never stored - only a salted (SECRET_KEY-mixed) SHA-256
 hash of it, pruned after 24h - so these tests also confirm the rate limit
@@ -61,21 +62,21 @@ def _contact(client, headers=None):
     )
 
 
-def test_register_blocks_the_6th_request_from_the_same_ip_within_an_hour(client, monkeypatch):
+def test_register_blocks_the_request_after_the_limit_from_the_same_ip_within_an_hour(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 
-    for i in range(5):
+    for i in range(app_module.SIGNUP_RATE_LIMIT):
         response = _register(client, f"limit{i}@example.com")
         assert response.status_code == 201
 
-    sixth = _register(client, "limit5@example.com")
-    assert sixth.status_code == 429
+    over_limit = _register(client, "limit-over@example.com")
+    assert over_limit.status_code == 429
 
 
 def test_register_rate_limit_is_per_ip_a_different_ip_is_unaffected(client, monkeypatch):
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 
-    for i in range(5):
+    for i in range(app_module.SIGNUP_RATE_LIMIT):
         response = _register(client, f"perip{i}@example.com")
         assert response.status_code == 201
 
@@ -96,7 +97,7 @@ def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
 
     with app_module.app.app_context():
         ip_hash = app_module._hash_ip("127.0.0.1")
-        for i in range(5):
+        for i in range(app_module.SIGNUP_RATE_LIMIT):
             db.session.add(SignupAttempt(
                 ip_hash=ip_hash,
                 endpoint="register",
@@ -108,19 +109,19 @@ def test_register_attempts_older_than_an_hour_dont_count(client, monkeypatch):
     assert response.status_code == 201
 
 
-def test_contact_blocks_the_6th_request_from_the_same_ip_within_an_hour(client, monkeypatch):
+def test_contact_blocks_the_request_after_the_limit_from_the_same_ip_within_an_hour(client, monkeypatch):
     """/api/v1/contact is public, unauthenticated, and sends a real Resend
     email per request with no other limit - an attacker blocked at /register
     would otherwise simply move here and burn the Resend quota. It shares the
     same per-IP rate limiter helper as register/resend-verification."""
     monkeypatch.setattr(app_module, "send_contact_email", lambda *a, **k: None)
 
-    for _ in range(5):
+    for _ in range(app_module.SIGNUP_RATE_LIMIT):
         response = _contact(client)
         assert response.status_code == 200
 
-    sixth = _contact(client)
-    assert sixth.status_code == 429
+    over_limit = _contact(client)
+    assert over_limit.status_code == 429
 
 
 def test_contact_rate_limit_bucket_is_independent_of_register(client, monkeypatch):
@@ -130,7 +131,7 @@ def test_contact_rate_limit_bucket_is_independent_of_register(client, monkeypatc
     monkeypatch.setattr(app_module, "send_contact_email", lambda *a, **k: None)
     monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
 
-    for _ in range(5):
+    for _ in range(app_module.SIGNUP_RATE_LIMIT):
         assert _contact(client).status_code == 200
     assert _contact(client).status_code == 429
 
@@ -147,8 +148,10 @@ def test_resend_verification_rate_limit_response_is_identical_to_the_unknown_ema
         lambda to_email, token: sent_to.append(to_email),
     )
 
+    request_count = app_module.SIGNUP_RATE_LIMIT + 1
+
     with app_module.app.app_context():
-        for i in range(6):
+        for i in range(request_count):
             db.session.add(User(
                 email=f"ratelimit-resend-{i}@example.com",
                 password=generate_password_hash_for_test("hunter22"),
@@ -166,20 +169,20 @@ def test_resend_verification_rate_limit_response_is_identical_to_the_unknown_ema
             "/api/v1/auth/resend-verification",
             json={"email": f"ratelimit-resend-{i}@example.com"},
         )
-        for i in range(6)
+        for i in range(request_count)
     ]
 
-    # Only the first 5 requests actually triggered a send.
-    assert len(sent_to) == 5
+    # Only the first SIGNUP_RATE_LIMIT requests actually triggered a send.
+    assert len(sent_to) == app_module.SIGNUP_RATE_LIMIT
 
-    sixth = responses[5]
+    over_limit = responses[-1]
     unknown_email_response = client.post(
         "/api/v1/auth/resend-verification", json={"email": "totally-unknown@example.com"}
     )
 
-    assert sixth.status_code == 200
+    assert over_limit.status_code == 200
     assert unknown_email_response.status_code == 200
-    assert sixth.get_data() == unknown_email_response.get_data()
-    # The 6th request was intercepted by the rate limiter, not the normal
-    # "account is resendable" path - no 6th email was sent.
-    assert len(sent_to) == 5
+    assert over_limit.get_data() == unknown_email_response.get_data()
+    # The over-limit request was intercepted by the rate limiter, not the
+    # normal "account is resendable" path - no extra email was sent.
+    assert len(sent_to) == app_module.SIGNUP_RATE_LIMIT
