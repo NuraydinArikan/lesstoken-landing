@@ -681,7 +681,13 @@ def send_contact_email(name, email, subject, message):
             'subject': f'[lesstoken.app] {_strip_header_newlines(subject)}',
             'text': body,
         },
-        timeout=20,
+        # Kept short deliberately: gunicorn runs 4 sync workers, and this
+        # call happens synchronously inside the request (contact() reports
+        # failure rather than success if the send doesn't complete). A slow
+        # Resend at timeout=20 could hold a worker for 20s each; with only 4
+        # workers, a handful of concurrent slow sends used to stall the
+        # entire API, including unrelated endpoints like /api/v1/health.
+        timeout=5,
     )
     response.raise_for_status()
 
@@ -711,7 +717,14 @@ def send_verification_email(to_email, token):
             'subject': 'LessToken - E-posta Doğrulama',
             'text': body,
         },
-        timeout=20,
+        # Kept short deliberately: register()'s rollback of the new user row
+        # on a failed send (see the docstring above) depends on this call
+        # being synchronous, so it can't be moved to a background thread -
+        # but that also means a slow Resend blocks a sync gunicorn worker
+        # for the full timeout. With only 4 workers, a handful of concurrent
+        # slow registrations at timeout=20 used to be enough to stall the
+        # entire API, including unrelated endpoints like /api/v1/health.
+        timeout=5,
     )
     response.raise_for_status()
 

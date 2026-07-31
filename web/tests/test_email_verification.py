@@ -63,6 +63,10 @@ def test_send_verification_email_posts_to_resend_with_the_link(monkeypatch):
     assert captured["headers"]["Authorization"] == "Bearer test-resend-key"
     assert captured["json"]["to"] == ["someone@example.com"]
     assert "abc123token" in captured["json"]["text"]
+    # Short timeout so a slow Resend can't hold a sync gunicorn worker (and,
+    # with 4 workers, the whole API) hostage for long. See the comment next
+    # to the timeout= arg in send_verification_email for the full reasoning.
+    assert captured["timeout"] == 5
 
 
 def test_send_verification_email_raises_when_resend_key_missing(monkeypatch):
