@@ -16,6 +16,7 @@ import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
+from sqlalchemy.exc import IntegrityError
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -261,14 +262,26 @@ def register():
                 'error': 'Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin.'
             }), 502
 
-        db.commit()
+        # Two concurrent registrations of the same new address can both pass
+        # the existence check above (a real race, not just a hypothetical -
+        # the check happens before up to 5s of network I/O in
+        # send_verification_email). The loser's commit raises IntegrityError
+        # on the unique constraint on users.email; treat that exactly like a
+        # normal duplicate-email conflict rather than letting it fall through
+        # to the generic 500 handler below.
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            return jsonify({'error': 'Email already registered'}), 409
 
         return jsonify({
             'message': 'Doğrulama e-postası gönderildi. Lütfen e-postanızı kontrol edin.'
         }), 201
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Registration failed')
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
@@ -314,8 +327,9 @@ def login():
             }
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @app.route('/api/v1/auth/verify', methods=['GET'])
@@ -493,8 +507,9 @@ def optimize(current_user_id):
             'history_id': history_entry.id
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 # ============================================================================
@@ -551,8 +566,9 @@ def get_history(current_user_id):
             }
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @app.route('/api/v1/history/<int:history_id>', methods=['GET'])
@@ -584,8 +600,9 @@ def get_history_detail(current_user_id, history_id):
             }
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @app.route('/api/v1/history', methods=['DELETE'])
@@ -602,8 +619,9 @@ def clear_history(current_user_id):
             'message': 'History cleared'
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 # ============================================================================
@@ -630,8 +648,9 @@ def get_profile(current_user_id):
             }
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @app.route('/api/v1/user/profile', methods=['PUT'])
@@ -659,8 +678,9 @@ def update_profile(current_user_id):
             'message': 'Profile updated'
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Unhandled error in %s', request.path)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 # ============================================================================

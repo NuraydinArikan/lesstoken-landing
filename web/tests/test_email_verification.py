@@ -19,6 +19,7 @@ os.environ["RESEND_API_KEY"] = "test-resend-key"
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import (
     check_password_hash,
     generate_password_hash as generate_password_hash_for_test,
@@ -137,6 +138,57 @@ def test_register_rolls_back_the_user_if_the_email_fails_to_send(client, monkeyp
     assert response.status_code == 502
     with app_module.app.app_context():
         assert db.session.query(User).filter_by(email="new@example.com").first() is None
+
+
+def test_register_returns_a_generic_409_and_does_not_leak_internals_on_a_concurrent_duplicate(client, monkeypatch):
+    """Two concurrent registrations of the same new address can both pass the
+    existence check (register() checks, then does up to 5s of email I/O,
+    then commits) - the loser's final db.commit() raises IntegrityError on
+    the unique constraint on users.email. Before the fix, that fell through
+    to `except Exception as e: jsonify({'error': str(e)})`, and
+    SQLAlchemy's IntegrityError.__str__ embeds the full failed SQL statement
+    AND its bound parameters - so the 500 body would have contained the
+    plaintext email and the scrypt password hash. It must now come back as
+    the same plain 409 a normal duplicate gets, with no exception internals
+    in the body."""
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *a, **k: None)
+
+    secret_password_hash = "scrypt$32768$8$1$supersecrethashvalue"
+    fake_integrity_error = IntegrityError(
+        "INSERT INTO users (email, password) VALUES (?, ?)",
+        {"email": "racer@example.com", "password": secret_password_hash},
+        Exception("UNIQUE constraint failed: users.email"),
+    )
+
+    # register() commits twice before this point: once inside the rate
+    # limiter's own bookkeeping, then again for the actual user row. Only the
+    # second (the one this test targets) should raise - the first must behave
+    # normally or every request would look rate-limiter-broken instead of
+    # exercising the duplicate-email race this test is about.
+    real_commit = db.session.commit
+    calls = {"count": 0}
+
+    def fake_commit():
+        calls["count"] += 1
+        if calls["count"] == 2:
+            raise fake_integrity_error
+        return real_commit()
+
+    monkeypatch.setattr(db.session, "commit", fake_commit)
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"email": "racer@example.com", "password": "hunter22"},
+    )
+
+    assert response.status_code == 409
+    assert response.get_json() == {"error": "Email already registered"}
+
+    body_text = response.get_data(as_text=True)
+    assert "scrypt" not in body_text
+    assert secret_password_hash not in body_text
+    assert "racer@example.com" not in body_text
+    assert "INSERT INTO users" not in body_text
 
 
 def test_login_rejects_an_unverified_account(client):
