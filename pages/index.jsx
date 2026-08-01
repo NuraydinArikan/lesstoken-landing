@@ -562,7 +562,7 @@ function HomeContent() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+                <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
                 <p className="font-bold">LessToken</p>
               </div>
               <p className="text-gray-400 text-sm">{i18n?.footer?.tagline}</p>
