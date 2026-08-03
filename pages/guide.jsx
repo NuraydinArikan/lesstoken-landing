@@ -217,6 +217,9 @@ export default function Guide() {
         <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '60px 20px', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '12px' }}>Kullanım Kılavuzu</h1>
           <p style={{ fontSize: '18px', opacity: 0.9 }}>LessToken\'ı adım adım öğrenin</p>
+          <div style={{ marginBottom: '24px', textAlign: 'center', marginTop: '24px' }}>
+            <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+          </div>
         </div>
 
         {/* Content */}
@@ -240,6 +243,9 @@ export default function Guide() {
 
           {/* Guide Content */}
           <div style={{ marginBottom: '60px' }}>
+            <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+              <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', margin: '0 auto' }} />
+            </div>
             <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '40px', color: '#1f2937' }}>
               {currentGuide.icon} {currentGuide.title}
             </h2>
@@ -290,6 +296,9 @@ export default function Guide() {
 
           {/* AI Providers Section */}
           <div style={{ marginBottom: '60px', paddingTop: '60px', borderTop: '1px solid #e5e7eb' }}>
+            <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+              <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', margin: '0 auto' }} />
+            </div>
             <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '40px', color: '#1f2937' }}>
               🤖 AI Sağlayıcıları Karşılaştırması
             </h2>
@@ -346,6 +355,9 @@ export default function Guide() {
           </div>
 
           {/* Tips Section */}
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', margin: '0 auto' }} />
+          </div>
           <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '24px' }}>
             <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#1e40af' }}>
               💡 Faydalı İpuçları
