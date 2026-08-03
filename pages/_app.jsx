@@ -13,8 +13,8 @@ export default function App({ Component, pageProps }) {
     setLang(detectLang());
   }, []);
 
-  // Don't render global Footer on home page (it has its own footer)
-  const showGlobalFooter = router.pathname !== '/';
+  // Don't render global Footer on home page (it has its own footer) or authenticated app routes
+  const showGlobalFooter = router.pathname !== '/' && !router.pathname.startsWith('/app');
 
   return (
     <div suppressHydrationWarning>
