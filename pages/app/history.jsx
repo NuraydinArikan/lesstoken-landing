@@ -89,7 +89,10 @@ export default function History() {
             >
               ← Panoya Dön
             </button>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0' }}>Optimizasyon Geçmişi</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img src="/mark-sm.svg" alt="LessToken" style={{ width: '40px', height: '40px' }} />
+              <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0' }}>Optimizasyon Geçmişi</h1>
+            </div>
             <div style={{ width: '100px' }}></div>
           </div>
         </header>
