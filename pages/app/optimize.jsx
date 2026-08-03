@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Header from '../../components/Header';
 import { apiUrl } from '../../lib/api';
 
 export default function Optimize() {
@@ -71,6 +72,8 @@ export default function Optimize() {
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+        <Header />
+
         {/* Header */}
         <header style={{
           background: 'linear-gradient(135deg, #0369a1 0%, #06b6d4 100%)',
@@ -94,7 +97,10 @@ export default function Optimize() {
             >
               ← Panoya Dön
             </button>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0' }}>Metni Optimize Et</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img src="/mark-sm.svg" alt="LessToken" style={{ width: '40px', height: '40px' }} />
+              <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0' }}>Metni Optimize Et</h1>
+            </div>
             <div style={{ width: '100px' }}></div>
           </div>
         </header>

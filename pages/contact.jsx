@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import Header from '../components/Header';
 import { apiUrl } from '../lib/api';
 
 export default function Contact() {
@@ -50,11 +51,16 @@ export default function Contact() {
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+        <Header />
+
         {/* Header */}
         <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '60px 20px' }}>
           <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
             <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '12px' }}>İletişime Geçin</h1>
             <p style={{ fontSize: '16px', opacity: 0.9 }}>Sorularınız veya önerileriniz varsa, bize yazın.</p>
+            <div style={{ marginBottom: '24px', textAlign: 'center', marginTop: '24px' }}>
+              <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+            </div>
           </div>
         </div>
 
@@ -84,6 +90,11 @@ export default function Contact() {
                 @NuraydinArikan
               </a>
             </div>
+          </div>
+
+          {/* Mark before Contact Form */}
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', margin: '0 auto' }} />
           </div>
 
           {/* Contact Form */}

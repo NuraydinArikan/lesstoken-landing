@@ -70,6 +70,12 @@ export default function Verify() {
           maxWidth: '400px',
           textAlign: 'center'
         }}>
+          <img
+            src="/mark-sm.svg"
+            alt="LessToken"
+            style={{ width: '40px', height: '40px', display: 'block', margin: '0 auto 20px' }}
+          />
+
           {status === 'checking' && <p>Doğrulanıyor...</p>}
 
           {status === 'success' && (

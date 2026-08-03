@@ -270,6 +270,11 @@ function HomeContent() {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
             {i18n?.hero?.title}
           </h1>
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            {/* Tailwind preflight makes img display:block, so textAlign alone
+                will not centre it - the auto margins do. */}
+            <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+          </div>
           <p className="text-2xl md:text-3xl font-semibold text-blue-200 mb-6">
             {i18n?.hero?.subtitle}
           </p>
@@ -562,7 +567,7 @@ function HomeContent() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+                <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
                 <p className="font-bold">LessToken</p>
               </div>
               <p className="text-gray-400 text-sm">{i18n?.footer?.tagline}</p>
@@ -607,6 +612,9 @@ function HomeContent() {
 function FeatureCard({ icon, title, description }) {
   return (
     <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-blue-500/50 transition">
+      <div style={{ marginBottom: '12px' }}>
+        <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+      </div>
       <div className="text-blue-400 mb-4">{icon}</div>
       <h3 className="text-xl font-bold mb-3">{title}</h3>
       <p className="text-gray-400">{description}</p>

@@ -1,6 +1,7 @@
 // pages/image.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
+import Header from '../components/Header';
 import ToolNav from '../components/ToolNav';
 import { computeTargetDimensions } from '../lib/imageResize';
 import { classifyFile } from '../lib/imageInput.mjs';
@@ -173,11 +174,17 @@ export default function ImageResizePage() {
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
         <div style={{ width: '100%', maxWidth: '860px' }}>
+          <Header lang={lang} active="image" />
           <ToolNav lang={lang} active="image" />
         </div>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
           {t.title}
         </h1>
+        <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+          {/* Tailwind preflight makes img display:block, so textAlign alone
+              will not centre it - the auto margins do. */}
+          <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+        </div>
         <p style={{ color: '#666', marginBottom: '30px', textAlign: 'center', maxWidth: '480px' }}>
           {t.intro}
         </p>
@@ -206,6 +213,7 @@ export default function ImageResizePage() {
             textAlign: 'center',
           }}
         >
+          <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
           {status === 'no-image' && (
             <p style={{ color: '#991b1b', margin: 0 }}>{t.statusNoImage}</p>
           )}
@@ -268,6 +276,7 @@ export default function ImageResizePage() {
             width: '100%',
             maxWidth: '480px',
           }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', marginBottom: '12px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
                 <p style={{ fontSize: '12px', color: '#047857', fontWeight: '600' }}>{t.statSize}</p>

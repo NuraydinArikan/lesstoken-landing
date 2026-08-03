@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Header from '../components/Header';
 import ToolNav from '../components/ToolNav';
 import { toolLocales, detectLang } from '../lib/toolI18n';
 import { safeSet } from '../lib/safeStorage';
@@ -79,8 +80,14 @@ export default function FileToolPage() {
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '40px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <Header lang={lang} active="file" />
           <ToolNav lang={lang} active="file" />
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>{t.title}</h1>
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            {/* Tailwind preflight makes img display:block, so textAlign alone
+                will not centre it - the auto margins do. */}
+            <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+          </div>
           <p style={{ fontSize: '13px', color: '#059669', marginBottom: '16px' }}>{t.privacyNote}</p>
 
           <div
@@ -88,6 +95,7 @@ export default function FileToolPage() {
             onDrop={onDrop}
             style={{ border: '2px dashed #9ca3af', borderRadius: '12px', background: 'white', padding: '28px', textAlign: 'center', marginBottom: '16px' }}
           >
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px', margin: '0 auto 12px' }} />
             <button type="button" onClick={() => inputRef.current?.click()} style={{ padding: '8px 18px', borderRadius: '8px', border: 'none', background: '#2563eb', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
               {t.pick}
             </button>
@@ -99,7 +107,10 @@ export default function FileToolPage() {
             {status === 'toolarge' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.tooLarge}</p>}
           </div>
 
-          <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.textLabel}</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.textLabel}</label>
+          </div>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}

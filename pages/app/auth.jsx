@@ -112,7 +112,7 @@ export default function Auth() {
         }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <img src="/logo.svg" alt="LessToken" style={{ width: '60px', height: '60px', marginBottom: '16px' }} />
+            <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', marginBottom: '16px' }} />
             <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0369a1', marginBottom: '8px' }}>
               LessToken
             </h1>
