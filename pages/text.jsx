@@ -96,9 +96,17 @@ export default function TextToolPage() {
           <Header lang={lang} active="text" />
           <ToolNav lang={lang} active="text" />
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>{t.title}</h1>
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            {/* Tailwind preflight makes img display:block, so textAlign alone
+                will not centre it - the auto margins do. */}
+            <img src="/mark.svg" alt="LessToken" style={{ width: '60px', height: '60px', margin: '0 auto' }} />
+          </div>
           <AiSettings lang={lang} onChange={setSettings} />
 
-          <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.inputLabel}</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.inputLabel}</label>
+          </div>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -134,7 +142,10 @@ export default function TextToolPage() {
 
           {note && <p style={{ fontSize: '13px', color: '#b45309', marginBottom: '10px' }}>{note}</p>}
 
-          <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.resultLabel}</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src="/mark-sm.svg" alt="LessToken" style={{ width: '32px', height: '32px' }} />
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{t.resultLabel}</label>
+          </div>
           <textarea
             value={output}
             readOnly
