@@ -70,7 +70,7 @@ export default function Dashboard() {
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.svg" alt="LessToken" style={{ width: '40px', height: '40px' }} />
+              <img src="/mark-sm.svg" alt="LessToken" style={{ width: '40px', height: '40px' }} />
               <div>
                 <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>LessToken</h1>
                 <p style={{ fontSize: '12px', opacity: 0.9, margin: '0' }}>AI Token Optimizer</p>
