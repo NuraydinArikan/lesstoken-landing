@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Header from '../components/Header';
 import ToolNav from '../components/ToolNav';
 import AiSettings from '../components/AiSettings';
 import { toolLocales, detectLang } from '../lib/toolI18n';
@@ -92,6 +93,7 @@ export default function TextToolPage() {
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '40px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <Header lang={lang} active="text" />
           <ToolNav lang={lang} active="text" />
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>{t.title}</h1>
           <AiSettings lang={lang} onChange={setSettings} />

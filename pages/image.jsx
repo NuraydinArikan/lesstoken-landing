@@ -1,6 +1,7 @@
 // pages/image.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
+import Header from '../components/Header';
 import ToolNav from '../components/ToolNav';
 import { computeTargetDimensions } from '../lib/imageResize';
 import { classifyFile } from '../lib/imageInput.mjs';
@@ -173,6 +174,7 @@ export default function ImageResizePage() {
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
         <div style={{ width: '100%', maxWidth: '860px' }}>
+          <Header lang={lang} active="image" />
           <ToolNav lang={lang} active="image" />
         </div>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>

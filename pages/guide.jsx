@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import Header from '../components/Header';
 
 export default function Guide() {
   const [activeTab, setActiveTab] = useState('desktop');
@@ -210,6 +211,8 @@ export default function Guide() {
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+        <Header />
+
         {/* Header */}
         <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', padding: '60px 20px', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '12px' }}>Kullanım Kılavuzu</h1>

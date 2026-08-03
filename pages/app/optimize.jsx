@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Header from '../../components/Header';
 import { apiUrl } from '../../lib/api';
 
 export default function Optimize() {
@@ -71,6 +72,8 @@ export default function Optimize() {
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+        <Header />
+
         {/* Header */}
         <header style={{
           background: 'linear-gradient(135deg, #0369a1 0%, #06b6d4 100%)',

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Header from '../components/Header';
 import ToolNav from '../components/ToolNav';
 import { toolLocales, detectLang } from '../lib/toolI18n';
 import { safeSet } from '../lib/safeStorage';
@@ -79,6 +80,7 @@ export default function FileToolPage() {
       </Head>
       <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '40px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <Header lang={lang} active="file" />
           <ToolNav lang={lang} active="file" />
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>{t.title}</h1>
           <p style={{ fontSize: '13px', color: '#059669', marginBottom: '16px' }}>{t.privacyNote}</p>
