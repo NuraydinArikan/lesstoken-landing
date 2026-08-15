@@ -59,25 +59,36 @@ test edilebilir tarafta durur. Next 14 `.mjs` import'unu sorunsuz çözer.
 
 ## Dil seçimi
 
-`pages/support.jsx`, `index.jsx`'teki deseni birebir tekrar eder:
+**Revize 2026-08-15.** İlk taslak `index.jsx`'teki inline `localStorage`
+mantığının kopyalanmasını söylüyordu. Gereksiz: `lib/toolI18n.js:168` zaten
+`detectLang()` ihraç ediyor ve `pages/_app.jsx` de onu kullanıyor.
 
 ```js
+import { detectLang } from '../lib/toolI18n';
+
 const [lang, setLang] = useState('tr');
-useEffect(() => {
-  if (typeof window === 'undefined') return;
-  const saved = localStorage.getItem('lang');
-  const detected = saved && ['tr','en'].includes(saved)
-    ? saved
-    : (['tr','en'].includes(navigator.language.split('-')[0])
-        ? navigator.language.split('-')[0]
-        : 'tr');
-  localStorage.setItem('lang', detected);
-  setLang(detected);
-}, []);
+useEffect(() => { setLang(detectLang()); }, []);
 ```
 
-Aynı `lang` anahtarı kullanıldığı için ana sayfada İngilizceye geçen kullanıcı
+`detectLang()` aynı `lang` anahtarını `safeGet` üzerinden okur — storage
+engellenmişse (gizli sekme, katı çerez ayarı) patlamak yerine tarayıcı diline
+düşer. Elle yazılmış `localStorage.getItem` bu korumayı kaybederdi.
+
+Aynı anahtar paylaşıldığından, ana sayfada İngilizceye geçen kullanıcı
 `/support`'u da İngilizce açar.
+
+## Stil
+
+Sayfa **Tailwind** kullanır. Tailwind 3.3 kurulu (`tailwind.config.js`,
+`postcss.config.js`, `styles/globals.css`) ve `index.jsx` onunla yazılmış.
+`contact.jsx`'in inline `style` nesneleri repodaki istisnadır; form taşınırken
+Tailwind'e çevrilir.
+
+## Footer
+
+`_app.jsx`, `/` ve `/app/*` dışındaki her sayfaya global `<Footer lang=... />`
+basar. `/support` bu koşulu sağladığı için footer'ı otomatik alır — sayfa
+kendi footer'ını **eklememelidir**.
 
 ## İçerik modeli
 
