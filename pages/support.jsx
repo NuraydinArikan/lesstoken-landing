@@ -2,8 +2,17 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { supportContent } from '../lib/supportContent.mjs';
 import { detectLang } from '../lib/toolI18n';
+import ContactForm from '../components/ContactForm';
 
 const PRODUCTS = ['extension', 'desktop', 'web'];
+
+// English regardless of page language: this reaches the maintainer's inbox,
+// and a per-language prefix would split one product across two labels.
+const SUBJECT_PREFIX = {
+  extension: 'Extension — ',
+  desktop: 'Desktop — ',
+  web: 'Web Tools — '
+};
 
 export default function Support() {
   const [lang, setLang] = useState('tr');
@@ -79,7 +88,7 @@ export default function Support() {
             })}
           </div>
 
-          {/* Task 3 mounts ContactForm here */}
+          <ContactForm lang={lang} defaultSubject={SUBJECT_PREFIX[activeTab]} />
         </div>
       </div>
     </>
