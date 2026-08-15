@@ -78,6 +78,11 @@ Output ONLY the optimized text, no explanations.`
 
 // Main optimization logic
 async function optimizeText(text, provider) {
+  // Ollama was dropped in 1.0.1. A user who selected it before the update
+  // still has it in storage, and would otherwise fail the API-key check below
+  // (there is no ollama-key) with a misleading "API key not configured".
+  if (provider === 'ollama') provider = 'openai';
+
   // Get API key from storage
   const settings = await chrome.storage.local.get([
     `${provider}-key`,
@@ -107,9 +112,6 @@ async function optimizeText(text, provider) {
       break;
     case 'gemini':
       ({ optimized, inputTokens, outputTokens } = await optimizeWithGemini(text, prompt, apiKey));
-      break;
-    case 'ollama':
-      ({ optimized, inputTokens, outputTokens } = await optimizeWithOllama(text, prompt));
       break;
     default:
       throw new Error('Unknown provider');
@@ -262,34 +264,5 @@ async function optimizeWithGemini(text, prompt, apiKey) {
     optimized: part.text,
     inputTokens: usage.promptTokenCount ?? text.split(/\s+/).length,
     outputTokens: usage.candidatesTokenCount ?? part.text.split(/\s+/).length
-  };
-}
-
-// Ollama (local) integration
-async function optimizeWithOllama(text, prompt) {
-  const { 'ollama-url': ollamaUrl } = await chrome.storage.local.get('ollama-url');
-  const url = ollamaUrl || 'http://localhost:11434';
-
-  const response = await fetch(`${url}/api/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'mistral',
-      prompt: `${prompt}\n\n${text}`,
-      stream: false
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Ollama error: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return {
-    optimized: data.response,
-    inputTokens: text.split(/\s+/).length,
-    outputTokens: data.response.split(/\s+/).length
   };
 }
