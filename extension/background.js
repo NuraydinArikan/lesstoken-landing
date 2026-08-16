@@ -113,6 +113,12 @@ async function optimizeText(text, provider) {
     case 'gemini':
       ({ optimized, inputTokens, outputTokens } = await optimizeWithGemini(text, prompt, apiKey));
       break;
+    case 'grok':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithGrok(text, prompt, apiKey));
+      break;
+    case 'deepseek':
+      ({ optimized, inputTokens, outputTokens } = await optimizeWithDeepSeek(text, prompt, apiKey));
+      break;
     default:
       throw new Error('Unknown provider');
   }
@@ -264,5 +270,75 @@ async function optimizeWithGemini(text, prompt, apiKey) {
     optimized: part.text,
     inputTokens: usage.promptTokenCount ?? text.split(/\s+/).length,
     outputTokens: usage.candidatesTokenCount ?? part.text.split(/\s+/).length
+  };
+}
+
+// Grok (x.ai) API integration -- OpenAI-compatible chat completions format.
+async function optimizeWithGrok(text, prompt, apiKey) {
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      // No floating "latest" alias offered, so pinned like OpenAI/Claude above.
+      model: 'grok-4.6',
+      messages: [{
+        role: 'system',
+        content: prompt
+      }, {
+        role: 'user',
+        content: text
+      }],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Grok API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.choices[0].message.content,
+    inputTokens: data.usage.prompt_tokens,
+    outputTokens: data.usage.completion_tokens
+  };
+}
+
+// DeepSeek API integration -- OpenAI-compatible chat completions format.
+async function optimizeWithDeepSeek(text, prompt, apiKey) {
+  const response = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      // Floating alias: DeepSeek repoints this at their current model.
+      model: 'deepseek-chat',
+      messages: [{
+        role: 'system',
+        content: prompt
+      }, {
+        role: 'user',
+        content: text
+      }],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`DeepSeek API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    optimized: data.choices[0].message.content,
+    inputTokens: data.usage.prompt_tokens,
+    outputTokens: data.usage.completion_tokens
   };
 }

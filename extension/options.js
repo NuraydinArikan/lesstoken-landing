@@ -3,6 +3,8 @@ const providerSelect = document.getElementById('provider');
 const openaiKeyInput = document.getElementById('openai-key');
 const claudeKeyInput = document.getElementById('claude-key');
 const geminiKeyInput = document.getElementById('gemini-key');
+const grokKeyInput = document.getElementById('grok-key');
+const deepseekKeyInput = document.getElementById('deepseek-key');
 const saveBtn = document.getElementById('save');
 const resetBtn = document.getElementById('reset');
 const statusDiv = document.getElementById('status');
@@ -13,7 +15,9 @@ window.addEventListener('load', () => {
     'provider',
     'openai-key',
     'claude-key',
-    'gemini-key'
+    'gemini-key',
+    'grok-key',
+    'deepseek-key'
   ], (result) => {
     // Ollama was dropped in 1.0.1. Anyone still holding it as their stored
     // provider would otherwise land on a <select> with no matching option,
@@ -23,6 +27,8 @@ window.addEventListener('load', () => {
     if (result['openai-key']) openaiKeyInput.value = result['openai-key'];
     if (result['claude-key']) claudeKeyInput.value = result['claude-key'];
     if (result['gemini-key']) geminiKeyInput.value = result['gemini-key'];
+    if (result['grok-key']) grokKeyInput.value = result['grok-key'];
+    if (result['deepseek-key']) deepseekKeyInput.value = result['deepseek-key'];
   });
 });
 
@@ -32,7 +38,9 @@ saveBtn.addEventListener('click', () => {
     provider: providerSelect.value,
     'openai-key': openaiKeyInput.value,
     'claude-key': claudeKeyInput.value,
-    'gemini-key': geminiKeyInput.value
+    'gemini-key': geminiKeyInput.value,
+    'grok-key': grokKeyInput.value,
+    'deepseek-key': deepseekKeyInput.value
   };
 
   chrome.storage.local.set(settings, () => {
@@ -50,6 +58,8 @@ resetBtn.addEventListener('click', () => {
       openaiKeyInput.value = '';
       claudeKeyInput.value = '';
       geminiKeyInput.value = '';
+      grokKeyInput.value = '';
+      deepseekKeyInput.value = '';
       providerSelect.value = 'openai';
       showStatus('Settings reset to defaults', 'success');
       setTimeout(() => {
