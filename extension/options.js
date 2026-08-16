@@ -3,7 +3,6 @@ const providerSelect = document.getElementById('provider');
 const openaiKeyInput = document.getElementById('openai-key');
 const claudeKeyInput = document.getElementById('claude-key');
 const geminiKeyInput = document.getElementById('gemini-key');
-const ollamaUrlInput = document.getElementById('ollama-url');
 const saveBtn = document.getElementById('save');
 const resetBtn = document.getElementById('reset');
 const statusDiv = document.getElementById('status');
@@ -14,14 +13,16 @@ window.addEventListener('load', () => {
     'provider',
     'openai-key',
     'claude-key',
-    'gemini-key',
-    'ollama-url'
+    'gemini-key'
   ], (result) => {
-    if (result.provider) providerSelect.value = result.provider;
+    // Ollama was dropped in 1.0.1. Anyone still holding it as their stored
+    // provider would otherwise land on a <select> with no matching option,
+    // which silently blanks the dropdown and saves an empty provider.
+    const provider = result.provider === 'ollama' ? 'openai' : result.provider;
+    if (provider) providerSelect.value = provider;
     if (result['openai-key']) openaiKeyInput.value = result['openai-key'];
     if (result['claude-key']) claudeKeyInput.value = result['claude-key'];
     if (result['gemini-key']) geminiKeyInput.value = result['gemini-key'];
-    if (result['ollama-url']) ollamaUrlInput.value = result['ollama-url'];
   });
 });
 
@@ -31,8 +32,7 @@ saveBtn.addEventListener('click', () => {
     provider: providerSelect.value,
     'openai-key': openaiKeyInput.value,
     'claude-key': claudeKeyInput.value,
-    'gemini-key': geminiKeyInput.value,
-    'ollama-url': ollamaUrlInput.value
+    'gemini-key': geminiKeyInput.value
   };
 
   chrome.storage.local.set(settings, () => {
@@ -50,7 +50,6 @@ resetBtn.addEventListener('click', () => {
       openaiKeyInput.value = '';
       claudeKeyInput.value = '';
       geminiKeyInput.value = '';
-      ollamaUrlInput.value = 'http://localhost:11434';
       providerSelect.value = 'openai';
       showStatus('Settings reset to defaults', 'success');
       setTimeout(() => {
