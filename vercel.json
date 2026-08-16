@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/contact",
+      "destination": "/support",
+      "permanent": false
+    }
+  ]
+}
