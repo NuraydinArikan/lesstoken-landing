@@ -110,7 +110,7 @@ curl https://lesstoken.app
 **5.1 Test All Pages**
 - [ ] Landing page (/)
 - [ ] Guide page (/guide)
-- [ ] Contact page (/contact)
+- [ ] Support page (/support)
 - [ ] Web app (/app)
   - [ ] Auth (login/signup)
   - [ ] Dashboard
@@ -203,7 +203,7 @@ curl https://lesstoken.app
 
 - **GitHub Issues:** https://github.com/NuraydinArikan/lesstoken-landing/issues
 - **Email:** nuraydinarikan@gmail.com
-- **Contact Form:** https://lesstoken.app/contact
+- **Support Page:** https://lesstoken.app/support
 
 ---
 

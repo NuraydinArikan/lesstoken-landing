@@ -59,8 +59,10 @@ export default function ContactForm({ lang = 'tr', defaultSubject = '' }) {
       if (response.status === 429) {
         setError(t.errorRateLimit);
       } else {
-        const data = await response.json().catch(() => ({}));
-        setError(data.error || t.errorGeneric);
+        // The backend's only non-429 failure body is hard-coded Turkish
+        // ("Mesaj gönderilemedi..."), so it can't be shown to English
+        // readers. Always use the localized copy instead of data.error.
+        setError(t.errorGeneric);
       }
       setStatus('error');
     } catch {

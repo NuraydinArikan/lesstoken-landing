@@ -42,6 +42,36 @@ test('every FAQ item has a non-empty question and answer', () => {
   }
 });
 
+test('FAQ item links, when present, are well-formed and match across locales', () => {
+  for (const product of PRODUCTS) {
+    const trItems = supportContent.tr.faq[product];
+    const enItems = supportContent.en.faq[product];
+    trItems.forEach((trItem, idx) => {
+      const enItem = enItems[idx];
+      for (const [locale, item] of [['tr', trItem], ['en', enItem]]) {
+        if (item.links === undefined) continue;
+        assert.ok(Array.isArray(item.links),
+          `${locale}.${product}[${idx}].links is not an array`);
+        item.links.forEach((link, linkIdx) => {
+          assert.equal(typeof link.label, 'string',
+            `${locale}.${product}[${idx}].links[${linkIdx}].label is not a string`);
+          assert.ok(link.label.trim().length > 0,
+            `${locale}.${product}[${idx}].links[${linkIdx}].label is blank`);
+          assert.equal(typeof link.href, 'string',
+            `${locale}.${product}[${idx}].links[${linkIdx}].href is not a string`);
+          assert.ok(link.href.trim().length > 0,
+            `${locale}.${product}[${idx}].links[${linkIdx}].href is blank`);
+        });
+      }
+      const trCount = trItem.links?.length ?? 0;
+      const enCount = enItem.links?.length ?? 0;
+      assert.equal(trCount, enCount,
+        `${product}[${idx}]: tr has ${trCount} links, en has ${enCount} -- ` +
+        'links must stay in parity like every other piece of this content');
+    });
+  }
+});
+
 test('tab labels and form strings are present in both locales', () => {
   for (const locale of LOCALES) {
     for (const product of PRODUCTS) {

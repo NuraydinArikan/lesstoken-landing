@@ -82,7 +82,30 @@ export default function Support() {
                     <span>{item.q}</span>
                     <span className="text-2xl leading-none shrink-0">{open ? '−' : '+'}</span>
                   </button>
-                  {open && <p className="mt-4 text-gray-300 leading-relaxed">{item.a}</p>}
+                  {open && (
+                    <>
+                      <p className="mt-4 text-gray-300 leading-relaxed">{item.a}</p>
+                      {item.links && item.links.length > 0 && (
+                        <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                          {item.links.map((link) => {
+                            const external = /^https?:\/\//.test(link.href);
+                            return (
+                              <li key={link.href}>
+                                <a
+                                  href={link.href}
+                                  target={external ? '_blank' : undefined}
+                                  rel={external ? 'noopener noreferrer' : undefined}
+                                  className="text-blue-300 underline underline-offset-2 hover:text-blue-400 transition"
+                                >
+                                  {link.label}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}
