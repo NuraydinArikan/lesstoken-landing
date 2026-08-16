@@ -142,7 +142,7 @@ export default function Footer({ lang = 'tr' }) {
                 </a>
               </li>
               <li>
-                <a href="/contact" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '14px' }}>
+                <a href="/support" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '14px' }}>
                   {lang === 'tr' ? 'İletişim' : 'Contact'}
                 </a>
               </li>

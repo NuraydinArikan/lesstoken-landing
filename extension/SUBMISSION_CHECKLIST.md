@@ -159,7 +159,7 @@ Privacy & Security:
 ✓ Open source (inspect on GitHub)
 
 Website: https://lesstoken.app
-GitHub: https://github.com/LessTokenApp
+Support: https://lesstoken.app/support
 Support: info@lesstoken.app
 ```
 

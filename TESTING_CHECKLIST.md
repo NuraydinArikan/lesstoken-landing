@@ -39,8 +39,8 @@ curl https://api.lesstoken.app/api/v1/status
 - [ ] Tips section visible
 - [ ] Links work
 
-### Contact Page
-- [ ] https://lesstoken.app/contact loads
+### Support Page
+- [ ] https://lesstoken.app/support loads
 - [ ] Email link works (mailto:)
 - [ ] Contact form loads
 - [ ] Form submission shows success message
