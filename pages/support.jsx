@@ -117,3 +117,9 @@ export default function Support() {
     </>
   );
 }
+
+// Read by pages/_app.jsx to pick the global Footer's dark palette. This page
+// is the one dark route among those that use the global footer (file, guide,
+// image, privacy, text are all light) -- without this the footer defaults to
+// light and clashes with the slate-900 background above it.
+Support.theme = 'dark';

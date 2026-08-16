@@ -89,7 +89,7 @@ const localesData = {
       ]
     },
     cta: { title: "AI Maliyetlerinden %96'ya Kadar Tasarruf Edin", desc: "Bugün token'larınızı optimize etmeye başla. Sadece 30 saniye sürüyor.", btn: "Şimdi İndir" },
-    footer: { tagline: "AI token kullanımını optimize edin", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", textTool: "Metin", imageTool: "Görsel", fileTool: "Dosya", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
+    footer: { tagline: "Yapay zeka tokenlerinizi ziyan etmeyin.", product: "Ürün", resources: "Kaynaklar", legal: "Yasal", textTool: "Metin", imageTool: "Görsel", fileTool: "Dosya", features: "Özellikler", pricingLink: "Fiyatlandırma", downloadLink: "İndir", docs: "Dokümantasyon", github: "GitHub", blog: "Blog", privacy: "Gizlilik", terms: "Şartlar", license: "Lisans", copyright: "© 2026 LessToken. Tüm hakları saklıdır. Bütçe bilinci olan geliştiriciler için sevgiyle yapılmıştır." }
   },
   en: {
     nav: { logo: "LessToken", tools: "Tools", textTool: "Text", imageTool: "Image", fileTool: "File", download: "Download" },
@@ -170,7 +170,7 @@ const localesData = {
       ]
     },
     cta: { title: "Save up to 96% on AI Costs", desc: "Start optimizing your tokens today. It only takes 30 seconds.", btn: "Download Now" },
-    footer: { tagline: "Optimize AI token usage", product: "Product", resources: "Resources", legal: "Legal", textTool: "Text", imageTool: "Image", fileTool: "File", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 LessToken. All rights reserved. Made with care for budget-conscious developers." }
+    footer: { tagline: "Don't waste your AI tokens.", product: "Product", resources: "Resources", legal: "Legal", textTool: "Text", imageTool: "Image", fileTool: "File", features: "Features", pricingLink: "Pricing", downloadLink: "Download", docs: "Documentation", github: "GitHub", blog: "Blog", privacy: "Privacy", terms: "Terms", license: "License", copyright: "© 2026 LessToken. All rights reserved. Made with care for budget-conscious developers." }
   }
 };
 
