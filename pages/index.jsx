@@ -33,7 +33,7 @@ const localesData = {
     },
     results: {
       title: "Gerçek Sonuçlar",
-      screenshot: { title: "4K Ekran Görüntüsü Optimizasyonu", before: "Öncesi", after: "Sonrası", savings: "%99 Tasarruf" },
+      screenshot: { title: "4K Ekran Görüntüsü Optimizasyonu", before: "Öncesi", after: "Sonrası", savings: "4K ekran görüntüsü mü? %90'ın üzerinde küçülür. Zaten küçük bir kırpma mı? Ona hiç dokunmayız." },
       pdf: { title: "50 Sayfalık PDF Çıkarma", before: "Öncesi", after: "Sonrası", savings: "%95 Tasarruf" },
       comparison: { title: "Çok Sağlayıcı Karşılaştırması", before: "Öncesi", after: "Sonrası", savings: "%96 Tasarruf", detail: "Aynı sonuç, 24¢ tasarruf" }
     },
@@ -114,7 +114,7 @@ const localesData = {
     },
     results: {
       title: "Real Results",
-      screenshot: { title: "4K Screenshot Optimization", before: "Before", after: "After", savings: "99% Savings" },
+      screenshot: { title: "4K Screenshot Optimization", before: "Before", after: "After", savings: "A 4K screenshot? Shrinks by 90%+. Already a small crop? We leave it alone." },
       pdf: { title: "50-Page PDF Extraction", before: "Before", after: "After", savings: "95% Savings" },
       comparison: { title: "Multi-Provider Comparison", before: "Before", after: "After", savings: "96% Savings", detail: "Same result, 24¢ saved" }
     },
