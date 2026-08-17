@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Less Token",
   "version": "1.0.1",
-  "description": "Cut ChatGPT, Claude & Gemini API costs — this browser extension trims filler from your prompts before you pay to send it.",
+  "description": "Cut your AI API costs — trims filler from your prompts before you pay to send it. Works with OpenAI, Claude, Gemini and more.",
   "permissions": [
     "clipboardRead",
     "storage"
