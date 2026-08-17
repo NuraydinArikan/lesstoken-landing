@@ -158,6 +158,29 @@ async function optimizeText(text, provider) {
   };
 }
 
+// Turns a failed response into a diagnosable message. response.statusText
+// alone is not enough: Chrome's fetch() reports it as '' for any HTTP/2
+// connection (HTTP/2 has no reason-phrase field, only a numeric :status),
+// and these APIs are commonly served over HTTP/2 -- confirmed live when a
+// real DeepSeek 401 surfaced as "DeepSeek API error: " with nothing after
+// the colon. Provider error bodies aren't uniform either: OpenAI/Claude/
+// Gemini/DeepSeek nest the text at error.message, but Grok returns error as
+// a plain string -- so both shapes are checked before falling back to
+// statusText or the bare status code.
+async function extractErrorMessage(response) {
+  let bodyMessage = '';
+  try {
+    const data = await response.json();
+    const err = data?.error;
+    if (typeof err === 'string') bodyMessage = err;
+    else if (typeof err?.message === 'string') bodyMessage = err.message;
+    else if (typeof data?.message === 'string') bodyMessage = data.message;
+  } catch {
+    // Body wasn't JSON -- fall through to status/statusText below.
+  }
+  return `${response.status} ${bodyMessage || response.statusText || '(no further detail)'}`;
+}
+
 // OpenAI API integration
 async function optimizeWithOpenAI(text, prompt, apiKey) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -181,7 +204,7 @@ async function optimizeWithOpenAI(text, prompt, apiKey) {
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.statusText}`);
+    throw new Error(`OpenAI API error: ${await extractErrorMessage(response)}`);
   }
 
   const data = await response.json();
@@ -213,7 +236,7 @@ async function optimizeWithClaude(text, prompt, apiKey) {
   });
 
   if (!response.ok) {
-    throw new Error(`Claude API error: ${response.statusText}`);
+    throw new Error(`Claude API error: ${await extractErrorMessage(response)}`);
   }
 
   const data = await response.json();
@@ -253,7 +276,7 @@ async function optimizeWithGemini(text, prompt, apiKey) {
   );
 
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.statusText}`);
+    throw new Error(`Gemini API error: ${await extractErrorMessage(response)}`);
   }
 
   const data = await response.json();
@@ -297,7 +320,7 @@ async function optimizeWithGrok(text, prompt, apiKey) {
   });
 
   if (!response.ok) {
-    throw new Error(`Grok API error: ${response.statusText}`);
+    throw new Error(`Grok API error: ${await extractErrorMessage(response)}`);
   }
 
   const data = await response.json();
@@ -332,7 +355,7 @@ async function optimizeWithDeepSeek(text, prompt, apiKey) {
   });
 
   if (!response.ok) {
-    throw new Error(`DeepSeek API error: ${response.statusText}`);
+    throw new Error(`DeepSeek API error: ${await extractErrorMessage(response)}`);
   }
 
   const data = await response.json();
