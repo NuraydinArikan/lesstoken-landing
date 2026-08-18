@@ -72,7 +72,7 @@ const localesData = {
         },
         {
           q: "Hangi dosya türleri desteklenir?",
-          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve PDF, Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web araçları görsel küçültmeyi ve TXT, Markdown ile Word (.docx) dosyalarından metin çıkarmayı destekler. Tarayıcı eklentisi şu an yalnızca metin optimize eder."
+          a: "Masaüstü uygulaması görselleri küçültür (PNG, JPEG, WEBP) ve PDF, Word, CSV, JSON, Markdown ile düz metin dosyalarından metin çıkarır. Panoya düşen ekran görüntüsünü otomatik olarak küçültebilir. Web araçları görsel küçültmeyi ve TXT, Markdown, Word (.docx), CSV ve PDF dosyalarından metin çıkarmayı destekler. Tarayıcı eklentisi şu an yalnızca metin optimize eder."
         },
         {
           q: "Birden fazla AI sağlayıcı kullanabilir miyim?",
@@ -153,7 +153,7 @@ const localesData = {
         },
         {
           q: "What file types are supported?",
-          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from PDF, Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web tools support image shrinking and text extraction from TXT, Markdown and Word (.docx) files. The browser extension currently optimizes text only."
+          a: "The desktop app shrinks images (PNG, JPEG, WEBP) and extracts text from PDF, Word, CSV, JSON, Markdown and plain text files. It can also shrink a screenshot automatically as soon as it lands on your clipboard. The web tools support image shrinking and text extraction from TXT, Markdown, Word (.docx), CSV and PDF files. The browser extension currently optimizes text only."
         },
         {
           q: "Can I use multiple AI providers?",
