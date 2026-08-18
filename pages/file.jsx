@@ -7,7 +7,7 @@ import { toolLocales, detectLang } from '../lib/toolI18n';
 import { safeSet } from '../lib/safeStorage';
 
 const TEXT_EXTENSIONS = ['txt', 'md', 'csv'];
-const MAX_FILE_BYTES = 2 * 1024 * 1024;
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 export default function FileToolPage() {
   const router = useRouter();
