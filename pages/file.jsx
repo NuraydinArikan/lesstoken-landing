@@ -6,7 +6,7 @@ import ToolNav from '../components/ToolNav';
 import { toolLocales, detectLang } from '../lib/toolI18n';
 import { safeSet } from '../lib/safeStorage';
 
-const TEXT_EXTENSIONS = ['txt', 'md'];
+const TEXT_EXTENSIONS = ['txt', 'md', 'csv'];
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
 export default function FileToolPage() {
@@ -100,7 +100,7 @@ export default function FileToolPage() {
               {t.pick}
             </button>
             <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '10px' }}>{t.drop}</p>
-            <input ref={inputRef} type="file" accept=".txt,.md,.docx" style={{ display: 'none' }} onChange={(e) => readFile(e.target.files?.[0])} />
+            <input ref={inputRef} type="file" accept=".txt,.md,.docx,.csv" style={{ display: 'none' }} onChange={(e) => readFile(e.target.files?.[0])} />
             {status === 'reading' && <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>{t.reading}</p>}
             {status === 'unsupported' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.unsupported}</p>}
             {status === 'error' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.readError}</p>}
