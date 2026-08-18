@@ -13,7 +13,7 @@ export default function FileToolPage() {
   const router = useRouter();
   const [lang, setLang] = useState('tr');
   const [text, setText] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | reading | done | error | unsupported | toolarge
+  const [status, setStatus] = useState('idle'); // idle | reading | done | error | unsupported | toolarge | empty
   const inputRef = useRef(null);
 
   const t = toolLocales[lang].file;
@@ -39,6 +39,23 @@ export default function FileToolPage() {
         const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
         setText(result.value);
         setStatus('done');
+      } else if (ext === 'pdf') {
+        const pdfjs = await import('pdfjs-dist');
+        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+        const pages = [];
+        for (let i = 1; i <= doc.numPages; i++) {
+          const page = await doc.getPage(i);
+          const content = await page.getTextContent();
+          pages.push(content.items.map((item) => item.str).join(' '));
+        }
+        const extracted = pages.join('\n\n').trim();
+        if (extracted) {
+          setText(extracted);
+          setStatus('done');
+        } else {
+          setStatus('empty');
+        }
       } else {
         setStatus('unsupported');
       }
@@ -100,11 +117,12 @@ export default function FileToolPage() {
               {t.pick}
             </button>
             <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '10px' }}>{t.drop}</p>
-            <input ref={inputRef} type="file" accept=".txt,.md,.docx,.csv" style={{ display: 'none' }} onChange={(e) => readFile(e.target.files?.[0])} />
+            <input ref={inputRef} type="file" accept=".txt,.md,.docx,.csv,.pdf" style={{ display: 'none' }} onChange={(e) => readFile(e.target.files?.[0])} />
             {status === 'reading' && <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>{t.reading}</p>}
             {status === 'unsupported' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.unsupported}</p>}
             {status === 'error' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.readError}</p>}
             {status === 'toolarge' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.tooLarge}</p>}
+            {status === 'empty' && <p style={{ fontSize: '13px', color: '#991b1b', marginTop: '8px' }}>{t.pdfEmpty}</p>}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
