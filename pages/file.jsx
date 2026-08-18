@@ -39,6 +39,11 @@ export default function FileToolPage() {
         const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
         setText(result.value);
         setStatus('done');
+      // public/pdf.worker.min.mjs is a hand-copied snapshot of this exact
+      // pdfjs-dist version (see package.json) -- pdf.js throws if the API
+      // and worker versions don't match exactly. Re-copy the worker file
+      // from node_modules/pdfjs-dist/build/ any time this dependency's
+      // version changes.
       } else if (ext === 'pdf') {
         const pdfjs = await import('pdfjs-dist');
         pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -54,6 +59,7 @@ export default function FileToolPage() {
           setText(extracted);
           setStatus('done');
         } else {
+          setText('');
           setStatus('empty');
         }
       } else {
