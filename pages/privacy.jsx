@@ -4,7 +4,7 @@ export default function Privacy() {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
         <div className="text-gray-700 space-y-6">
-          <p className="text-sm text-gray-500">Last updated: August 4, 2026</p>
+          <p className="text-sm text-gray-500">Last updated: August 18, 2026</p>
 
           <section>
             <h2 className="text-2xl font-bold mb-3 mt-8">1. Overview</h2>
@@ -20,7 +20,7 @@ export default function Privacy() {
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>API Keys:</strong> Stored locally in your browser only. Never sent to our servers.</li>
               <li><strong>Optimization History:</strong> Stored locally in your browser's storage. Never sent to our servers.</li>
-              <li><strong>Text You Optimize:</strong> Sent directly to your chosen AI provider (OpenAI, Anthropic, Google, or local Ollama). Never sent to Less Token servers.</li>
+              <li><strong>Text You Optimize:</strong> Sent directly to your chosen AI provider (OpenAI, Anthropic, Google, Grok, or DeepSeek). Never sent to Less Token servers.</li>
             </ul>
 
             <h3 className="text-xl font-semibold mb-2 mt-4">Website Usage:</h3>
@@ -57,7 +57,8 @@ export default function Privacy() {
               <li><strong>OpenAI:</strong> Governed by OpenAI's privacy policy</li>
               <li><strong>Anthropic (Claude):</strong> Governed by Anthropic's privacy policy</li>
               <li><strong>Google (Gemini):</strong> Governed by Google's privacy policy</li>
-              <li><strong>Ollama (local):</strong> Runs on your machine, no external calls</li>
+              <li><strong>Grok (x.ai):</strong> Governed by x.ai's privacy policy</li>
+              <li><strong>DeepSeek:</strong> Governed by DeepSeek's privacy policy</li>
             </ul>
             <p className="mt-3">Your API keys are YOUR responsibility. We never access them.</p>
           </section>
