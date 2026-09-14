@@ -14,7 +14,7 @@ const JPEG_QUALITY = 0.8;
 
 export default function ImageResizePage() {
   const [lang, setLang] = useState('tr');
-  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | not-image | error
+  const [status, setStatus] = useState('idle'); // idle | processing | done | no-image | not-image | heic | error
   const [dragging, setDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [original, setOriginal] = useState(null); // { width, height, bytes }
@@ -52,6 +52,16 @@ export default function ImageResizePage() {
       jpegBlobRef.current = null;
 
       createImageBitmap(sourceBlob).then((bitmap) => {
+        if (mySeq !== jobSeqRef.current) return;
+
+        if (!bitmap.width || !bitmap.height) {
+          // E.g. an SVG with no intrinsic size - drawing it would just
+          // produce a blank canvas and a null toBlob() result later.
+          console.error('image resize: decoded bitmap has zero dimensions', sourceBlob.type);
+          setStatus('error');
+          return;
+        }
+
         const { width, height } = computeTargetDimensions(bitmap.width, bitmap.height, MAX_WIDTH, MAX_HEIGHT);
 
         const canvas = document.createElement('canvas');
@@ -68,6 +78,7 @@ export default function ImageResizePage() {
           if (mySeq !== jobSeqRef.current) return;
 
           if (!resizedBlob) {
+            console.error('image resize: canvas.toBlob returned null');
             setStatus('error');
             return;
           }
@@ -89,8 +100,9 @@ export default function ImageResizePage() {
             setJpegBytes(jpegBlob.size);
           }, 'image/jpeg', JPEG_QUALITY);
         }, 'image/png');
-      }).catch(() => {
+      }).catch((err) => {
         if (mySeq !== jobSeqRef.current) return;
+        console.error('image resize: failed to decode image', err);
         setStatus('error');
       });
   };
@@ -102,6 +114,10 @@ export default function ImageResizePage() {
     if (verdict === 'ignore') return;
     if (verdict === 'not-image') {
       setStatus('not-image');
+      return;
+    }
+    if (verdict === 'heic') {
+      setStatus('heic');
       return;
     }
     processBlob(file);
@@ -220,6 +236,9 @@ export default function ImageResizePage() {
           {status === 'not-image' && (
             <p style={{ color: '#991b1b', margin: 0 }}>{t.statusNotImage}</p>
           )}
+          {status === 'heic' && (
+            <p style={{ color: '#991b1b', margin: 0 }}>{t.statusHeic}</p>
+          )}
           {status === 'error' && (
             <p style={{ color: '#991b1b', margin: 0 }}>{t.statusError}</p>
           )}
@@ -230,7 +249,7 @@ export default function ImageResizePage() {
 
           {status !== 'processing' && (
             <div>
-              {status !== 'done' && (
+              {status === 'idle' && (
                 <p style={{ color: '#9ca3af', margin: '0 0 12px 0' }}>{t.statusIdle}</p>
               )}
               <button
